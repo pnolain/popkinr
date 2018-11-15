@@ -1,0 +1,138 @@
+---
+params:
+  run: x
+  estimation_number: x
+header-includes:
+  - \usepackage{fancyhdr}
+  - \usepackage{lipsum}
+  - \pagestyle{fancy}
+  - \fancyhf{}
+  - \fancyhead[L]{Run ID{{:}} `r str_replace_all(params$run$info$run_id, '_', '\\\\_')`}
+  - \renewcommand\footrulewidth{1pt}
+  - \fancyfoot[L]{`r str_replace_all(params$run$info$path, '_', '\\\\_')`}
+  - \fancyfoot[R]{\thepage}
+  - \fancypagestyle{plain}{\pagestyle{fancy}}
+title: "Estimation summary"
+date: "`r paste('Report generation:', format(Sys.time(), '%m/%d/%Y (%H:%M)'))`"
+output: 
+  pdf_document: default
+  html_vignette:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+library(pmxploit)
+library(tibble)
+library(tidyr)
+library(dplyr)
+
+run <- params$run
+n_estimation <- params$estimation_number
+```
+
+```{r base info}
+base_info_df <- data_frame(ID = run$info$run_id,
+                           `CONTROL STREAM` = run$info$control_stream_file,
+                           `DATASET` = run$info$dataset_file,
+                           `OBSERVATIONS` = run$info$number_of_observations,
+                           `INDIVIDUALS` = run$info$number_of_subjects,
+                           PROBLEM = run$info$problem,
+                           START = format(run$info$start_time, "%d/%m/%Y %H:%M"),
+                           DURATION = lubridate::seconds_to_period(run$info$duration))
+
+knitr::kable(gather(base_info_df), caption = "Base info", col.names = c("", ""))
+```
+
+```{r run info}
+est <- run$estimations[[n_estimation]]
+
+est_df <- data_frame(`ESTIMATION STEP` = sprintf("%s of %s", n_estimation, length(run$estimations)),
+                     METHOD = est$title,
+                     STATUS = ifelse(est$failed, "Failed",
+                                     ifelse(!est$minimization,
+                                            "No minimization",
+                                            ifelse(est$termination_status == 0,
+                                                   "Successful",
+                                                   "Terminated"))),
+                     DURATION = lubridate::seconds_to_period(est$duration),
+                     SIGDIGITS = est$significant_digits,
+                     EIGENRATIO = est$eigenratio,
+                     CORRELATION = est$correlation,
+                     OBJ = est$final_ofv,
+                     AIC = est$aic,
+                     BIC = est$bic)
+
+knitr::kable(gather(est_df), caption = "Estimation info", col.names = c("", ""))
+```
+
+```{r thetas}
+if(!is.null(est$thetas)){
+  thetas_df <- est$thetas %>%
+    mutate(rse = rse * 100, ci_low = ci_low, ci_up = ci_up) %>% 
+    rename(ID = id, THETA = name, Estimate = estimate, SE = se, `RSE (%)` = rse, LO = ci_low, UP = ci_up) %>% 
+    arrange(ID)
+  
+  knitr::kable(thetas_df, caption = "Fixed effects")
+}
+```
+
+```{r omegas}
+if(!is.null(est$omega)){
+  omegas_df <- est$omega %>%
+    mutate(eta1 = sprintf("%s:%s", eta1, eta2)) %>% 
+    mutate(rse = rse * 100, ci_low = ci_low, ci_up = ci_up) %>% 
+    select(-eta2) %>% 
+    rename(COVARIANCE = eta1, Estimate = estimate, SE = se, `RSE (%)` = rse, LO = ci_low, UP = ci_up) %>% 
+    arrange(COVARIANCE)
+  
+  knitr::kable(omegas_df, caption = "Random effects covariances")
+}
+```
+
+```{r eta bars}
+if(!is.null(est$eta_bars)){
+  eta_bars_df <- est$eta_bars %>%
+    rename(ID = id, ETA = name, ETABAR = value, SE = se, `p-value` = pvalue) %>% 
+    arrange(ID) 
+  
+  knitr::kable(eta_bars_df, caption = "Empirical Bayes Estimates mean values (ETABAR)")
+}
+```
+
+```{r eta shrinkage}
+if(!is.null(est$shrinkage)){
+  eta_shrink_df <- est$shrinkage %>%
+    filter(type != "EPS")  %>%
+    spread(type, shrinkage) %>%
+    select(parameter, ETA, EBV) %>%
+    rename(`ETA shrinkage` = ETA, `EBV shrinkage` = EBV)
+  
+  knitr::kable(eta_shrink_df, caption = "Random effects shrinkage")
+}
+```
+
+```{r sigma}
+if(!is.null(est$sigma)){
+  eps_df <- est$sigma %>% 
+    mutate(epsilon1 = sprintf("%s:%s", epsilon1, epsilon2),
+           rse = rse * 100) %>% 
+    select(-epsilon2) %>% 
+    rename(`COVARIANCE` = epsilon1, Estimate = estimate, SE = se, `RSE (%)` = rse, LO = ci_low, UP = ci_up) %>% 
+    arrange(COVARIANCE)
+  
+  knitr::kable(eps_df, caption = "Residual error terms covariances")
+}
+```
+
+```{r eps shrinkage}
+if(!is.null(est$shrinkage)){
+  eps_shrink_df <- est$shrinkage %>%
+    filter(type == "EPS") %>% 
+    select(-type) %>% 
+    arrange(parameter)
+  
+  knitr::kable(eps_shrink_df,  caption = "Residual error terms shrinkage")
+}
+```

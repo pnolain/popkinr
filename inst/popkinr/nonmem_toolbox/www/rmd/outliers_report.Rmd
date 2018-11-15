@@ -1,0 +1,191 @@
+---
+params:
+  run: x
+  compartment: x
+  residuals: x
+  keep_time_zero: x
+  pvalue: x
+  boxplot_coefficient: x
+header-includes:
+  - \usepackage{fancyhdr}
+  - \usepackage{lipsum}
+  - \pagestyle{fancy}
+  - \fancyhf{}
+  - \fancyhead[L]{Run ID{{:}} `r str_replace_all(params$run$info$run_id, '_', '\\\\_')`}
+  - \renewcommand\footrulewidth{1pt}
+  - \fancyfoot[L]{`r str_replace_all(params$run$info$path, '_', '\\\\_')`}
+  - \fancyfoot[R]{\thepage}
+  - \fancypagestyle{plain}{\pagestyle{fancy}}
+title: "Outliers detection"
+subtitle:  "Based on `r params$residuals`"
+date: "`r paste('Report generation:', format(Sys.time(), '%m/%d/%Y (%H:%M)'))`"
+output: 
+  pdf_document: default
+  html_vignette:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+run <- params$run
+```
+
+## Info
+
+```{r}
+filters <- attr(run$tables$pmxploitab, "filters")
+
+has_filters <- !is.null(filters)
+n_obs <- run$info$number_of_observations
+n_filtered_rows <- nrow(run$tables$pmxploitab)
+
+filter_text <- ifelse(has_filters & (n_filtered_rows != n_obs),
+                      sprintf("%s (filtered from %s)", n_filtered_rows, n_obs),
+                      n_obs)
+```
+
+Number of observations: `r filter_text`
+
+`r if(has_filters) {"Filters:"}`
+```{r}
+if(has_filters)
+  knitr::kable(tibble(condition = as.character(filters)), align = "c")
+```
+
+# Normality check
+
+```{r}
+cleaned_df <- run %>%
+  filter(!is.na(DV), MDV == 0, CMT == params$compartment) %>% 
+  pluck("tables") %>% 
+  pluck("pmxploitab")
+
+if(!params$keep_time_zero)
+  cleaned_df <- cleaned_df %>% filter(TIME > 0)
+```
+
+## Q-Q plot
+```{r}
+ggplot(cleaned_df)+
+    geom_qq(aes_string(sample = params$residuals))+
+    labs(x = "Normal distribution quantiles", y = paste(params$residuals, "distribution quantiles"))
+```
+
+## Kolmogorov-Smirnov test
+```{r}
+values <- cleaned_df[[params$residuals]]
+
+ks <- ks.test(unique(values), "pnorm", mean = mean(values), sd = sd(values))
+
+stats_df <- data_frame(mean = mean(values), sd = sd(values)) %>%
+  rename(!!!setNames(nm = sprintf("%s (%s)", params$residuals, colnames(.)), colnames(.)))
+
+test_df <- broom::tidy(ks) %>%
+  mutate(p.value = format(p.value, scientific = TRUE))# %>% 
+
+ks_df <- bind_cols(stats_df, test_df)
+
+knitr::kable(ks_df, align = "c")
+```
+
+```{r echo = FALSE}
+normality_ok <- ks$p.value > params$pvalue
+normality_msg <- (if(normality_ok){
+  sprintf("Normality hypothesis cannot be rejected (p-value > %s)", params$pvalue)
+} else {
+  sprintf("Normality hypothesis is rejected (p-value < %s)", params$pvalue)
+})
+```
+
+`r normality_msg`
+
+Note: duplicate values are considered as one unique value
+
+# Grubb's test (T-procedure)
+
+```{r}
+grubbs <- run %>% detect_outliers(
+  compartment = params$compartment,
+  residuals = params$residuals,
+  method = "grubbs",
+  grubbs_pvalue_threshold = params$pvalue, 
+  keep_time_zero = params$keep_time_zero)
+
+n_outliers <- nrow(grubbs$outliers)
+n_source <- nrow(grubbs$source)
+
+grubbs_msg <- (
+  if(n_outliers == 0) {
+    sprintf("No outliers detected in %s observations.", n_source)
+  } else if (n_outliers == 1) {
+    sprintf("One outlier detected in %s observations (%s).", n_source, scales::percent(n_outliers / n_source))
+  } else {
+    sprintf("%s outliers detected in %s observations (%s).", n_outliers, n_source, scales::percent(n_outliers / n_source))
+  })
+```
+
+`r grubbs_msg`
+
+## Outliers
+
+```{r}
+if(nrow(grubbs$outliers) > 0) 
+  knitr::kable(grubbs$outliers, align = "c")
+```
+
+
+Note: Grubb's test makes the assumption that data is normally distributed.
+
+# Non-parametric
+
+```{r, echo = FALSE}
+boxplot <- run %>% 
+  detect_outliers(compartment = params$compartment,
+                  residuals = params$residuals,
+                  method = "boxplot",
+                  boxplot_coefficient = params$boxplot_coefficient, 
+                  keep_time_zero = params$keep_time_zero)
+
+n_outliers <- nrow(boxplot$outliers)
+n_source <- nrow(boxplot$source)
+
+boxplot_msg <- (
+  if(n_outliers == 0) {
+    sprintf("No outliers detected in %s observations.", n_source)
+  } else if (n_outliers == 1) {
+    sprintf("One outlier detected in %s observations (%s).", n_source, scales::percent(n_outliers / n_source))
+  } else {
+    sprintf("%s outliers detected in %s observations (%s).", n_outliers, n_source, scales::percent(n_outliers / n_source))
+  })
+```
+
+`r boxplot_msg`
+
+Observations are detected as outliers if they are outside of the following interval:
+
+$$\mathopen{[}F_f - k \cdot IQR\,;F_t + k \cdot IQR\mathclose{]}$$
+
+with `Ff` being the first quartile, `Ft` the third quartile, `IQR` the inter-quartile range `(Ft-Ff)` and `k` is a coefficient (length of the whiskers as multiple of `IQR`; here `k = ``r params$boxplot_coefficient`).
+
+## Outliers
+
+```{r}
+if(nrow(boxplot$outliers) > 0)
+  knitr::kable(boxplot$outliers, align = "c")
+```
+
+## Box-and-whisker plot
+
+```{r}
+g <- ggplot(mapping = aes_string(x = factor(1), y = boxplot$residuals))+
+  geom_boxplot(data = boxplot$source, coef = params$boxplot_coefficient, outlier.colour = "red")+
+  scale_x_discrete(breaks = NULL)+
+  labs(x = NULL, y = boxplot$residuals)
+
+if(nrow(boxplot$outliers) > 0){
+  g <- g + geom_text(data = boxplot$outliers, aes(label = ID), size = 4, position = position_jitter(width = 0.2))
+}
+
+g
+```

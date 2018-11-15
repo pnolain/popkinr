@@ -1,0 +1,25 @@
+#browser_container.waiting, #browser_container.waiting * {
+  cursor: wait;
+}
+
+#loading-content {
+  position: absolute;
+  background: #FFFFFF;
+  opacity: 0.9;
+  z-index: 1000000;
+  left: 0;
+  right: 0;
+  top:0;
+  height: 100%;
+  text-align: center;
+  color: #00000;
+  padding-top: 200px;
+}
+
+.modal-lg{
+  width:80%;
+}
+
+.swal2-popup {
+  font-size: 1.6rem !important;
+}

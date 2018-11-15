@@ -1,0 +1,37 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# NONMEM toolbox
+
+```{r}
+nonmem_toolbox()
+```
+
+```{r}
+nonmem_toolbox(nonmem_exe = "/software/nonmem/nonmem741_openleap43/run/nmfe74",
+               nmcheck_exe = "/software/nonmem/nonmem741_openleap43/tr/NMTRAN.exe")
+```
+
+```{r}
+nonmem_toolbox(nonmem_exe = "/usr/local/bin/nmr",
+               nonmem_call = "{nonmem_exe} -local {control_file}",
+               nmcheck_exe = "/usr/local/bin/nmr",
+               nmcheck_call = "{nmcheck_exe} -test {control_file}")
+```
+
+# NONMEM monitor
+
+```{r}
+nonmem_monitor(nonmem_exe = "/software/nonmem/nonmem741_openleap43/run/nmfe74",
+               nmcheck_exe = "/software/nonmem/nonmem741_openleap43/tr/NMTRAN.exe",
+               nonmem_parafile = "/software/nonmem/nonmem741_openleap43/runfiles/mpilinux8.pnm")
+```
+
+```{r}
+nonmem_monitor(nonmem_exe = "/usr/local/bin/nmr",
+               nonmem_call = "{nonmem_exe} -local {control_file}",
+               nmcheck_exe = "/usr/local/bin/nmr",
+               nmcheck_call = "{nmcheck_exe} -test {control_file}")
+```

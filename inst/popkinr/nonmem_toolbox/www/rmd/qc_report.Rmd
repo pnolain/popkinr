@@ -1,0 +1,168 @@
+---
+params:
+  run: x
+  prediction: x
+  log_data: x
+  alpha: x
+header-includes:
+  - \usepackage{fancyhdr}
+  - \usepackage{lipsum}
+  - \pagestyle{fancy}
+  - \fancyhf{}
+  - \fancyhead[L]{Run ID{{:}} `r str_replace_all(params$run$info$run_id, '_', '\\\\_')`}
+  - \renewcommand\footrulewidth{1pt}
+  - \fancyfoot[L]{`r str_replace_all(params$run$info$path, '_', '\\\\_')`}
+  - \fancyfoot[R]{\thepage}
+  - \fancypagestyle{plain}{\pagestyle{fancy}}
+title: "Quality Criteria"
+subtitle:  "DV vs `r params$prediction` `r ifelse(length(groups(params$run$tables$pmxploitab)) > 0, paste0('(by ', paste(groups(params$run$tables$pmxploitab), collapse = ', '), ')'), '')`"
+date: "`r paste('Report generation:', format(Sys.time(), '%m/%d/%Y (%H:%M)'))`"
+classoption: "`r ifelse(length(groups(params$run$tables$pmxploitab)) > 2, 'landscape', 'portrait')`"
+output: 
+  pdf_document: default
+  html_vignette:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+run <- params$run
+grp_names <- groups(params$run$tables$pmxploitab)
+group_cols <- plyr::mapvalues(as.character(grp_names), run$model$covariates$column, run$model$covariates$name,
+                              warn_missing = FALSE)
+```
+
+```{r}
+qc <- run %>% quality_criteria(prediction = params$prediction,
+                               log_data = params$log_data,
+                               alpha = params$alpha)
+```
+
+## Info
+
+```{r}
+filters <- attr(run$tables$pmxploitab, "filters")
+
+has_filters <- !is.null(filters)
+n_obs <- run$info$number_of_observations
+n_filtered_rows <- nrow(run$tables$pmxploitab)
+
+filter_text <- ifelse(has_filters & (n_filtered_rows != n_obs),
+                      sprintf("%s (filtered from %s)", n_filtered_rows, n_obs),
+                      n_obs)
+```
+
+Number of observations: `r filter_text`
+
+`r if(has_filters) {"Filters:"}`
+```{r}
+if(has_filters)
+  knitr::kable(tibble(condition = as.character(filters)), align = "c")
+```
+
+
+## Standard QC
+```{r}
+qc_cols <- intersect(colnames(qc), c("n_observations", "standard", group_cols))
+
+qc_s <- qc %>% select(one_of(qc_cols)) %>% unnest() %>% rename("Maximal Error" = max_err,
+                                                               "Average Fold Error" = afe)
+
+knitr::kable(qc_s, align = "c")
+```
+
+## Bias (Mean Prediction Error)
+```{r}
+qc_cols <- intersect(colnames(qc), c("n_observations", "bias", group_cols))
+
+qc_b <- qc %>% select(one_of(qc_cols)) %>% unnest()
+
+ci <- (1 - as.numeric(params$alpha)) * 100
+
+dots <- setNames(c("value", "ci_low", "ci_up", "relative_value"),
+                 nm = c("MPE (absolute)", paste(ci, "% CI (lower bound)"), paste(ci, "% CI (upper bound)"), "MPE (%)"))
+
+qc_b <- qc_b %>% rename(!!!dots) %>% 
+  mutate(`MPE (%)` = `MPE (%)` * 100)
+
+knitr::kable(qc_b, align = "c")
+```
+
+## Precision (Root Mean Square Error)
+```{r}
+qc_cols <- intersect(colnames(qc), c("n_observations", "precision", group_cols))
+
+qc_p <- qc %>% select(one_of(qc_cols)) %>% unnest()
+
+ci <- (1 - as.numeric(params$alpha)) * 100
+
+dots <- setNames(c("value", "ci_low", "ci_up", "relative_value"),
+                 nm = c("RMSE (absolute)", paste(ci, "% CI (lower bound)"), paste(ci, "% CI (upper bound)"), "RMSE (%)"))
+
+qc_p <- qc_p %>% rename(!!!dots) %>% 
+  mutate(`RMSE (%)` = `RMSE (%)` * 100)
+
+knitr::kable(qc_p, align = "c")
+```
+
+## Student's t-Test
+
+### Observations vs Predictions; paired, two-sided
+```{r}
+qc_cols <- intersect(colnames(qc), c("n_observations", "t_test_obs", group_cols))
+
+qc_t_o <- qc %>% 
+  select(one_of(qc_cols))  %>%
+  mutate(t_test_obs = map(t_test_obs, broom::tidy)) %>%
+  unnest() %>%
+  select(-method, -alternative)
+
+knitr::kable(qc_t_o)
+```
+
+
+### Residuals vs zero; paired, two-sided
+```{r}
+qc_cols <- intersect(colnames(qc), c("n_observations", "t_test_res", group_cols))
+
+qc_t_r <-qc %>%
+    select(one_of(qc_cols))  %>%
+    unnest() %>%
+    mutate(t.test = map(t.test, broom::tidy)) %>%
+    unnest() %>%
+    select(-method, -alternative)
+
+knitr::kable(qc_t_r)
+```
+
+## Correlation test
+Observations vs Predictions
+```{r}
+ qc_cols <- intersect(colnames(qc), c("n_observations", "correlation_test", group_cols))
+
+qc_c <- qc %>%
+  select(one_of(qc_cols)) %>%
+  mutate(correlation_test = map(correlation_test, broom::tidy)) %>%
+  unnest() %>%
+  select(-method, -alternative)
+
+
+knitr::kable(qc_c)
+# knitr::kable(broom::tidy(qc$correlation_test) %>%
+#                select(estimate, statistic, p.value, parameter,	conf.low,	conf.high), align = "c")
+```
+
+## Linear regression
+$$Prediction = Intercept + Slope * Observation$$
+```{r}
+qc_cols <- intersect(colnames(qc), c("n_observations", "linear_regression", group_cols))
+
+qc_l <- qc %>%
+  select(one_of(qc_cols)) %>% 
+  mutate(linear_regression = map(linear_regression, tidy)) %>%
+  unnest() %>%
+  mutate(term = plyr::revalue(term, c("observations" = "slope")))
+    
+knitr::kable(qc_l, align = "c")
+```

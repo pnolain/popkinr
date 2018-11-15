@@ -1,0 +1,71 @@
+#browser_container.waiting, #browser_container.waiting * {
+  cursor: wait;
+}
+
+#application_top_text{
+overflow:hidden;
+}
+
+.modal-lg{
+  width:80%;
+}
+
+.swal2-popup {
+  font-size: 1.6rem !important;
+}
+
+
+/*
+.shiny-progress .progress-text {
+  position: absolute;
+  right: 10px;
+  min-height: 24px;
+  width: 450px;
+  background-color: #eef8ff;
+  margin: 0;
+  padding: 2px 3px;
+  opacity: 0.85;
+}
+
+.navbar-nav>.messages-menu>.dropdown-menu, .navbar-nav>.notifications-menu>.dropdown-menu, .navbar-nav>.tasks-menu>.dropdown-menu {
+    width: 500px;
+    padding: 0!important;
+    margin: 0!important;
+    top: 100%;
+}*/
+#shiny-notification-panel{
+  width: 700px;
+}
+
+.dataTable td {
+padding: 3px 10px;
+width: 1px;
+white-space: nowrap;
+}
+
+#loading-content {
+  position: absolute;
+  background: #FFFFFF;
+  opacity: 0.9;
+  z-index: 1000000;
+  left: 0;
+  right: 0;
+  top:0;
+  height: 100%;
+  text-align: center;
+  color: #00000;
+  padding-top: 200px;
+}
+
+.progress-striped .bar {
+      background-color: #149bdf;
+      background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.6)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.6)), color-stop(0.75, rgba(255, 255, 255, 0.6)), color-stop(0.75, transparent), to(transparent));
+      background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.6) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.6) 75%, transparent 75%, transparent);
+      background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, 0.6) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.6) 75%, transparent 75%, transparent);
+      background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.6) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.6) 75%, transparent 75%, transparent);
+      background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.6) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.6) 75%, transparent 75%, transparent);
+      -webkit-background-size: 40px 40px;
+         -moz-background-size: 40px 40px;
+           -o-background-size: 40px 40px;
+              background-size: 40px 40px;
+    }
