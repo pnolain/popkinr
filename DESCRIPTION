@@ -4,24 +4,24 @@ Title: Shiny applications for pharmacometrics
 Version: 1.1
 Authors@R: c(person("Patrick", "Nolain", email = "patrick.nolain@sanofi.com", role = c("aut", "cre")))
 Description: Shiny application for exploratory dataset analysis, NONMEM run management and post-processing
-License: LGPL-3
+License: GPL-3
 Encoding: UTF-8
 Imports:
-  shiny,
-  stringr
+    shiny,
+    stringr,
+    tibble
 Suggests:
-  future,
-  future.batchtools,
-  shinydashboard,
-  pmxploit,
-  pmxexecute,
-  vpc,
-  purrr,
-  tibble,
-  dplyr,
-  tidyr,
-  readr,
-  jsonlite,
-  magrittr
+    future,
+    future.batchtools,
+    shinydashboard,
+    pmxploit,
+    pmxexecute,
+    vpc,
+    purrr,
+    dplyr,
+    tidyr,
+    readr,
+    jsonlite,
+    magrittr
 LazyData: true
 RoxygenNote: 6.1.0
