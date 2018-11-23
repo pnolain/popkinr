@@ -344,7 +344,8 @@ open_run <- function(run_path){
         notifs <- bind_rows(notifs, list(status = "warning", message = "No random (ETA) parameter found in tables."))
     }
 
-    session$sendCustomMessage("collapse_box", message = "recent_box")
+    # session$sendCustomMessage("collapse_box", message = "recent_box")
+    shinyjs::runjs("$('#recent_box').closest('.box').find('[data-widget=collapse]').click();")
 
     removeModal()
 

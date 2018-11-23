@@ -1,24 +1,3 @@
-
-Shiny.addCustomMessageHandler('scroll_to_item',  function(id) {
-  var elem = document.getElementById(id);
-  if(elem !== null)
-    elem.scrollIntoView();
-});
-
-
-Shiny.addCustomMessageHandler('collapse_box',  function(boxid) {
-  $('#' + boxid).closest('.box').find('[data-widget=collapse]').click();
-});
-
-Shiny.addCustomMessageHandler('show_waiting_cursor',  function(id) {
-  $('#' + id).addClass('waiting');
-});
-
-Shiny.addCustomMessageHandler('hide_waiting_cursor',  function(id) {
-  $('#' + id).removeClass('waiting');
-});
-
-
 Shiny.addCustomMessageHandler('popup_msg',  function(msg) {
   var title = 'Message';
   var description = '';

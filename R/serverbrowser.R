@@ -88,7 +88,8 @@ serverBrowser <- function(input, output, session, root_directory,
 
   observe({
 
-    session$sendCustomMessage(type = "show_waiting_cursor", message = "browser_container")
+    # session$sendCustomMessage(type = "show_waiting_cursor", message = "browser_container")
+    shinyjs::runjs("$('#browser_container').addClass('waiting');")
 
     so <- safe_observe()
 
@@ -97,7 +98,8 @@ serverBrowser <- function(input, output, session, root_directory,
       print(so$error$message)
     }
 
-    session$sendCustomMessage(type = "hide_waiting_cursor", message = "browser_container")
+    shinyjs::runjs("$('#browser_container').removeClass('waiting');")
+    # session$sendCustomMessage(type = "hide_waiting_cursor", message = "browser_container")
   })
 
   browsing_tree <- reactive({
@@ -272,7 +274,7 @@ serverBrowser <- function(input, output, session, root_directory,
     selectInput(session$ns("folder_shortcuts"),
                 "Jump to folder",
                 choices = c("/", sort(folders_paths)),
-                selected = rv$folder_selection,
+                selected = isolate(rv$folder_selection),
                 width = "100%")
   })
 
@@ -291,7 +293,12 @@ serverBrowser <- function(input, output, session, root_directory,
   observeEvent(input$browsing_tree, {
     # Scroll to directory item when tree is updated
     if(!is.null(rv$force_scroll) && rv$folder_selection != "/"){
-      session$sendCustomMessage(type = "scroll_to_item", message = rv$folder_selection)
+
+      shinyjs::runjs(sprintf("var id = '%s'; var elem = document.getElementById(id);
+                             if(elem !== null) elem.scrollIntoView();", rv$folder_selection))
+
+      # shinyjs::runjs(sprintf("$('#' + %s).scrollIntoView();", rv$folder_selection))
+
       rv$force_scroll <- NULL
     }
   })
