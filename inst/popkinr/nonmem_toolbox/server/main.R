@@ -452,7 +452,7 @@ observe({
   }
 
   updateSelectizeInput(session, "indiv_cat_cov", server = TRUE,
-                       choices = cat_choices)
+                       choices = cat_choices, selected = '')
 
   updateSelectizeInput(session, "diagnostic_split_by", server = TRUE,
                        choices = diag_cat_cmt_choices, selected = diag_cat_cmt_choices_selection)

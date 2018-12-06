@@ -31,7 +31,7 @@ output$indiv_cat_cov <- renderUI({
 
   selectizeInput("indiv_cat_cov",
                  label = "Categorical covariate", multiple = FALSE,
-                 choices = cat_choices)
+                 choices = cat_choices, selected = NULL)
 })
 
 output$indiv_pred_type <- renderUI({
