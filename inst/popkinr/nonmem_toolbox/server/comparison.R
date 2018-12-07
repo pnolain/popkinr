@@ -602,7 +602,7 @@ observeEvent(input$clear_comparison_table, {
 })
 
 observeEvent(input$click_remove_run_from_list, {
-  js <- jsonlite::fromJSON(input$click_remove_run_from_list)
+  js <- fromJSON(input$click_remove_run_from_list)
 
   cp_res <- req(comparison_results())#req(rv_comp$comparison_data)
 
@@ -613,7 +613,7 @@ observeEvent(input$click_remove_run_from_list, {
 })
 
 observeEvent(input$click_compare_control_stream, {
-  js <- jsonlite::fromJSON(input$click_compare_control_stream)
+  js <- fromJSON(input$click_compare_control_stream)
 
   cp_res <- req(comparison_results())
   r_index <- as.integer(js$run_index)
@@ -627,7 +627,7 @@ observeEvent(input$click_compare_control_stream, {
 
     if (identical(cs1, cs2)) {
       session$sendCustomMessage(type = "popup_msg",
-                                message = jsonlite::toJSON(
+                                message = toJSON(
                                   list(
                                     type = "info",
                                     title = "Info",
@@ -808,7 +808,7 @@ output$control_stream_diffr <- diffr::renderDiffr({
 })
 
 observeEvent(input$click_open_run_to_compare, {
-  js <- jsonlite::fromJSON(input$click_open_run_to_compare)
+  js <- fromJSON(input$click_open_run_to_compare)
 
   cp_res <- req(comparison_results())
 
