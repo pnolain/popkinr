@@ -1,21 +1,3 @@
-library(shiny)
-library(DT)
-library(tidyverse)
-library(lubridate)
-library(R6)
-library(shinytoastr)
-library(xml2)
-
-library(pmxploit)
-library(pmxecute)
-
-library(future)
-library(promises)
-#plan(multicore) # forked R processes
-#plan(multisession) # background R sessions
-plan(multiprocess) # multicore if supported, otherwise multisession
-# plan(sequential)
-
 server <- function(input, output, session){
   options(shiny.deprecation.messages = FALSE)
   # options("shiny.fullstacktrace"=TRUE)
