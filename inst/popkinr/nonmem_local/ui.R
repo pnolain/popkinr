@@ -4,6 +4,7 @@ library(DT)
 library(shinyjs)
 library(R6)
 library(shinytoastr)
+library(shinyAce)
 
 library(ggplot2)
 library(tidyr)
@@ -26,7 +27,7 @@ plan(multiprocess) # multicore if supported, otherwise multisession
 # plan(sequential)
 
 source("modules/controlStreamUI.R")
-source("modules/serverbrowser.R")
+# source("modules/serverbrowser.R")
 
 app_title <- "PopkinR - NONMEM Monitor"
 

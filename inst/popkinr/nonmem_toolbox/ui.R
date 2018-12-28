@@ -10,7 +10,6 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(tidyr)
   library(dplyr)
-  library(magrittr)
   library(stringr)
   library(purrr)
   library(readr)
