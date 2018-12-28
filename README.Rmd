@@ -12,38 +12,33 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+
 # popkinr
 
-The goal of popkinr is to ...
+PopkinR contains `shiny` applications for:
 
-## Installation
+* Exploration of NONMEM-like datasets (`PMXplore`)
+* Launch of NONMEM runs and editing control files (`PMXecute`)
+* Post-processing of NONMEM runs results (`PMXploit`)
 
-You can install the released version of popkinr from [CRAN](https://CRAN.R-project.org) with:
+## PMXplore `popkinr::dataset_exploration`
 
-``` r
-install.packages("popkinr")
-```
+....
 
-## Example
+## PMXecute `popkinr::nonmem_local`
 
-This is a basic example which shows you how to solve a common problem:
+....
 
-```{r example}
-## basic example code
-```
+## PMXploit `popkinr::nonmem_toolbox`
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+....
 
-```{r cars}
-summary(cars)
-```
+# Installation
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
+## Packages dependencies
 
-You can also embed plots, for example:
+...
 
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
+## System requirements
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
+...
