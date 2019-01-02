@@ -128,11 +128,12 @@ knitr::kable(qc_t_o)
 qc_cols <- intersect(colnames(qc), c("n_observations", "t_test_res", group_cols))
 
 qc_t_r <-qc %>%
-    select(one_of(qc_cols))  %>%
-    unnest() %>%
-    mutate(t.test = map(t.test, broom::tidy)) %>%
-    unnest() %>%
-    select(-method, -alternative)
+  select(one_of(qc_cols)) %>% 
+  filter(!map_lgl(t_test_res, is.null))%>%
+  unnest() %>%
+  mutate(t.test = map(t.test, broom::tidy)) %>%
+  unnest() %>%
+  select(-method, -alternative)
 
 knitr::kable(qc_t_r)
 ```
@@ -140,7 +141,7 @@ knitr::kable(qc_t_r)
 ## Correlation test
 Observations vs Predictions
 ```{r}
- qc_cols <- intersect(colnames(qc), c("n_observations", "correlation_test", group_cols))
+qc_cols <- intersect(colnames(qc), c("n_observations", "correlation_test", group_cols))
 
 qc_c <- qc %>%
   select(one_of(qc_cols)) %>%
@@ -150,8 +151,6 @@ qc_c <- qc %>%
 
 
 knitr::kable(qc_c)
-# knitr::kable(broom::tidy(qc$correlation_test) %>%
-#                select(estimate, statistic, p.value, parameter,	conf.low,	conf.high), align = "c")
 ```
 
 ## Linear regression
@@ -164,6 +163,6 @@ qc_l <- qc %>%
   mutate(linear_regression = map(linear_regression, tidy)) %>%
   unnest() %>%
   mutate(term = plyr::revalue(term, c("observations" = "slope")))
-    
+
 knitr::kable(qc_l, align = "c")
 ```

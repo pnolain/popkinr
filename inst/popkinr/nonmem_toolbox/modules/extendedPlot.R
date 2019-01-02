@@ -158,6 +158,10 @@ extendedPlot <- function(input, output, session,
     # Create a `load_nm_run` call with the run path
     load_run_call <- call2(quote(load_nm_run), inner_run()$info$path)
 
+    if(identical(inner_run(), pmxploit::EXAMPLERUN)){
+      load_run_call <- quote(pmxploit::EXAMPLERUN)
+    }
+
     # Construct the full call:
     # load_nm_run %>% filter (if any) %>% group_by (if any) %>% pmxploit_call %>% theme_pmx())
     calls <- c(load_run_call, filter_call, group_by_call, pmxploit_call)

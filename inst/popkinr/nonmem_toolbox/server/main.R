@@ -733,6 +733,7 @@ output$filtered_dataset <- renderDataTable({
 
 save_rmd_to_run <- function(output_filename, rmd_file, format, rmd_params){
   run_path <- rv$run_path
+  browser()
 
   is_directory <- file.info(run_path)$isdir
 

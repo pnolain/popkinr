@@ -6,14 +6,130 @@ run_quality_criteria <- reactive({
 
   grps <- map(input$qc_split_by, as.symbol)
 
-  run_qc <- filtered_run() %>%
+  filtered_run() %>%
     group_by(UQS(grps)) %>%
     quality_criteria(prediction = pred,
                      log_data = log_data,
                      alpha = as.numeric(input$qc_alpha))
-
-  run_qc
 })
+
+
+observe({
+  run_quality_criteria()
+
+  build_pmxploit_qc_call()
+
+})
+
+build_pmxploit_qc_call <- function(){
+  # Get run_quality_criteria function content
+  qc_reactive_envir <- get_env(run_quality_criteria)
+
+  qc_reactive_fn <- qc_reactive_envir$.origFunc
+
+  # Evaluate the qc function
+  qc_fn_envir <- get_env(qc_reactive_fn)
+  qc_fn_body <- body(qc_reactive_fn)
+
+  eval(qc_fn_body, qc_fn_envir)
+
+  # Extract the last line of the function
+  # -> supposed to be a call to a pmxploit qc function
+  return_line <- as.list(qc_fn_body) %>% keep(is_call) %>% last()
+
+  # Extract the links of a pipe chain (eg. filter %>% group_by %>% qc_fn)
+  extract_chain_links <- function(chain){
+    current_call_args <- call_args(chain)
+    chain_links <- list()
+
+    for(item in current_call_args){
+      new_item <- if(is_call(item, "%>%")) extract_chain_links(item) else item
+      chain_links <- c(chain_links, new_item)
+    }
+    chain_links
+  }
+
+  chain_links <- extract_chain_links(return_line)
+
+  # Check if the run is currently filtered, ie. object comes either from `filtered_run()` or `filtered_run_show_mdv()` reactives
+  filter_call <- NULL
+  filter_link <- chain_links[which(map_lgl(chain_links, ~ is_call(., "filtered_run") || is_call(., "filtered_run_show_mdv")))]
+
+  if(length(filter_link) == 1L){
+    filter_fn <- call_name(filter_link[[1]])
+    # Extract current filters from the application reactiveValues `rv`
+    main_rv <- env_get(qc_fn_envir, "rv")
+    run_filters <- main_rv$app_filters
+
+    if(filter_fn == "filtered_run_show_mdv")
+      run_filters <- discard(run_filters, ~ all.equal(., quo(MDV == 0)) == TRUE)
+
+    if(length(run_filters) > 0L){
+      # remove `~` operator
+      run_filters <- run_filters %>% map(~as.list(.)[[2]])
+
+      # Create a filter call
+      filter_call <- call2(quote(filter), UQS(run_filters))
+    }
+  }
+
+  # Check if the qc must be grouped
+  group_by_call <- NULL
+  group_by_chain <- chain_links[which(map_lgl(chain_links, ~ is_call(., "group_by")))]
+
+  if(length(group_by_chain) == 1L){
+    # Extract current grouping columns
+    grps <- env_get(qc_fn_envir, as.character(call_args(call_args(group_by_chain[[1]])[[1]])[[1]]))
+
+    if(length(grps) > 0){
+      group_by_call <- call2(quote(group_by), UQS(syms(grps)))
+    }
+  }
+
+  # Last link should be a pmxploit qc function calls
+  pmxploit_chain <- last(chain_links)
+
+  # Get the arguments of the function call
+  fargs <- call_args(pmxploit_chain)
+
+  # Evaluate the arguments to get the UI widgets values
+  args_values <- map(fargs[names(fargs) != ""], ~ unname(eval(., envir = qc_fn_envir)))
+  # args_values <- map(fargs[names(fargs) != ""], ~ eval(., envir = qc_fn_envir))
+
+  edit_call <- function(cc, ...){
+    args <- dots_list(...)
+    call_modify(cc, UQS(args))
+  }
+
+  # Edit the call to integrate de arguments values
+  # pmxploit_call <- edit_call(pmxploit_chain, UQS(args_values))
+
+  # NEW: Remove default arguments that are not changed
+  original_args <- formals(eval(first(pmxploit_chain)))
+
+  args_to_skip <- map2_lgl(args_values, original_args[names(args_values)], function(a, b){
+    if(is_missing(b)) return(FALSE)
+    identical(unname(a), unname(eval(b)))
+  })
+
+  args_values <- args_values[!args_to_skip]
+  pmxploit_call <- call2(first(pmxploit_chain), UQS(args_values))
+
+  # Create a `load_nm_run` call with the run path
+  load_run_call <- call2(quote(load_nm_run), run$info$path)
+
+  if(identical(run, pmxploit::EXAMPLERUN)){
+    load_run_call <- quote(pmxploit::EXAMPLERUN)
+  }
+  # Construct the full call:
+  # load_nm_run %>% filter (if any) %>% group_by (if any) %>% pmxploit_call %>% theme_pmx())
+  calls <- c(load_run_call, filter_call, group_by_call, pmxploit_call)
+  txt <- map_chr(calls, ~ str_c(deparse(., width.cutoff = 150L), collapse = "\n"))
+  full_text <- str_c(txt, collapse = " %>%\n\t")
+
+  shinyAce::updateAceEditor(session, "qc_r_code", full_text)
+}
+
 
 output$qc_pred_type <- renderUI({
   run <- req(rv$run)
@@ -110,6 +226,7 @@ output$qc_t_test_res <- renderDataTable({
 
   qc_t <- qc %>%
     select(one_of(qc_cols))  %>%
+    filter(!map_lgl(t_test_res, is.null)) %>%
     unnest() %>%
     mutate(t.test = map(t.test, tidy)) %>%
     unnest() %>%

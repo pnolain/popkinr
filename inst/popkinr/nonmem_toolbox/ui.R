@@ -1334,7 +1334,9 @@ dashboardPage(
                      DT::dataTableOutput("qc_corr_test")),
             tabPanel(title = "Linear regression",
                      DT::dataTableOutput("qc_lin_reg"),
-                     uiOutput("run_qc_lin_reg_plot"))
+                     uiOutput("run_qc_lin_reg_plot")),
+            tabPanel(title = "R code",
+                     shinyAce::aceEditor("qc_r_code", mode = "r", height = "100px", readOnly = TRUE))
         )
       )
       ),

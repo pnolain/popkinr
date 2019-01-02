@@ -62,10 +62,10 @@ extendedDTnew <- function(input, output, session, reactive_table, filename = "ta
     filter_call <- NULL
     filter_link <- chain_links[which(map_lgl(chain_links, ~ is_call(., "filtered_run") || is_call(., "filtered_run_show_mdv")))]
 
+    # Extract current filters from the application reactiveValues `rv`
+    main_rv <- env_get(table_fn_envir, "rv")
     if(length(filter_link) == 1L){
       filter_fn <- call_name(filter_link[[1]])
-      # Extract current filters from the application reactiveValues `rv`
-      main_rv <- env_get(table_fn_envir, "rv")
       run_filters <- main_rv$app_filters
 
       if(filter_fn == "filtered_run_show_mdv")
@@ -123,9 +123,16 @@ extendedDTnew <- function(input, output, session, reactive_table, filename = "ta
     args_values <- args_values[!args_to_skip]
     pmxploit_call <- call2(first(pmxploit_chain), UQS(args_values))
 
+    # Create a `load_nm_run` call with the run path
+    load_run_call <- call2(quote(load_nm_run), main_rv$run$info$path)
+
+    if(identical(main_rv$run, pmxploit::EXAMPLERUN)){
+      load_run_call <- quote(pmxploit::EXAMPLERUN)
+    }
+
     # Construct the full call:
-    # load_nm_run %>% filter (if any) %>% group_by (if any) %>% pmxploit_call
-    calls <- c(quote(run), filter_call, group_by_call, pmxploit_call)
+    # load_nm_run %>% filter (if any) %>% group_by (if any) %>% pmxploit_call %>% theme_pmx())
+    calls <- c(load_run_call, filter_call, group_by_call, pmxploit_call)
     txt <- map_chr(calls, ~ str_c(deparse(., width.cutoff = 150L), collapse = "\n"))
     full_text <- str_c(txt, collapse = " %>%\n\t")
 
