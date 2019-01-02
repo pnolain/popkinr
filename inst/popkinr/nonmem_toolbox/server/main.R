@@ -556,7 +556,7 @@ observeEvent(input$example, {
   run_browser()$reset()
   metadata_browser()$reset()
 
-  rv$run_path <- '/path/to/example'
+  rv$run_path <- '/path/to/example.tar.gz'
 
   rv_comp$runs_to_compare <- NULL
 
