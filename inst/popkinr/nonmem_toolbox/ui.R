@@ -123,12 +123,13 @@ dashboardPage(
         ),
         h6(
           sprintf(
-            "pmxploit version: %s (%s)",
-            packageDescription("pmxploit")$Version,
-            packageDescription("pmxploit")$Date
+            "PopkinR version: %s (%s)",
+            packageDescription("popkinr")$Version,
+            packageDescription("popkinr")$Date
           )
         ),
-        h6("Patrick Nolain, Sanofi M&S Montpellier"),
+        h6("Patrick Nolain"),
+        tags$a("patrick.nolain@sanofi.com", href="mailto:patrick.nolain@sanofi.com"),
         hr(),
         actionLink("example", "Demo")
       )
@@ -393,7 +394,7 @@ dashboardPage(
                     div(tags$ul(
                       tags$li(
                         "ETA shrinkage: Inter-subject shrinkage for each ETA",
-                        withMathJax('$$\\eta_{shrink}=1-\\frac{SD(\\hat\\eta)}{\\omega}$$')
+                        withMathJax('$$\\eta_{shrink}=1-\\dfrac{SD(\\hat\\eta)}{\\omega}$$')
                       ),
                       tags$li(
                         "EBV shrinkage: Shrinkage based on the average empirical Bayes variance"
@@ -1291,23 +1292,38 @@ dashboardPage(
           tabBox(
             width = 12,
             tabPanel(title = "Standard QC",
-                     DT::dataTableOutput("qc_standard"),
-                     div(
-                       tags$ul(
-                         tags$li("Maximal Error:",
-                                 withMathJax('$$ME=max(|obs_i-pred_i|)$$')),
-                         tags$li(
-                           "Average fold error:",
-                           withMathJax(
-                             '$$AFE=10^{\\frac{\\sum_{i=1}^N{|log(\\frac{obs}{pred}) |}}{N}}$$'
-                           )
-                         )
-                       )
-                     ),
-                     h4("Bias (Mean Prediction Error)"),
-                     DT::dataTableOutput("qc_bias"),
-                     h4("Precision (Root Mean Square Error)"),
-                     DT::dataTableOutput("qc_precision")),
+                     fluidRow(column(9,
+                                     DT::dataTableOutput("qc_standard"),
+                                     h4("Bias (Mean Prediction Error)"),
+                                     DT::dataTableOutput("qc_bias"),
+                                     h4("Precision (Root Mean Square Error)"),
+                                     DT::dataTableOutput("qc_precision")),
+                              column(3,
+                                     h4("Formulas"),
+                                     tags$ul(
+                                       tags$li("Maximal Error:",
+                                               withMathJax('$$ME=max(|pred_i-obs_i|)$$')),
+                                       tags$li(
+                                         "Absolute Average Fold Error:",
+                                         withMathJax(
+                                           '$$AAFE=10^{\\dfrac{1}{N}{\\sum_{i=1}^N{|log(\\dfrac{obs_i}{pred_i}) |}}}$$'
+                                         )
+                                       ),
+                                       tags$li(
+                                         "Average Fold Error:",
+                                         withMathJax(
+                                           '$$AFE=10^{\\dfrac{1}{N}{\\sum_{i=1}^N{log(\\dfrac{obs_i}{pred_i})}}}$$'
+                                         )
+                                       ),
+                                       tags$li("MPE (absolute)",
+                                               withMathJax('$$MPE=\\dfrac{1}{N}{\\sum_{i=1}^N{pred_i-obs_i}}$$')),
+                                       tags$li("MPE (relative)",
+                                               withMathJax('$$MPE(\\%)=\\dfrac{1}{N}{\\sum_{i=1}^N{\\dfrac{pred_i-obs_i}{obs_i}}}$$')),
+                                       tags$li("RMSE (absolute)",
+                                               withMathJax('$$RMSE=\\sqrt{\\dfrac{\\sum_{i=1}^N{(pred_i-obs_i)^2}}{N}}$$')),
+                                       tags$li("RMSE (relative)",
+                                               withMathJax('$$RMSE(\\%)=\\dfrac{RMSE}{\\overline{obs}}$$'))
+                                     )))),
             tabPanel(title = "Student's t-Tests",
                      em("Observations vs Predictions; paired, two-sided"),
                      DT::dataTableOutput("qc_t_test_obs"),

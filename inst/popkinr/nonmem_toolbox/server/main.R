@@ -238,7 +238,8 @@ observeEvent(input$load_run, {
 observeEvent(rv$run_path, {
   path <- req(rv$run_path)
 
-  open_run(path)
+  if(file.exists(path)) # do not run for Demo run
+    open_run(path)
 })
 
 add_run_to_history <- function(run){
@@ -555,7 +556,7 @@ observeEvent(input$example, {
   run_browser()$reset()
   metadata_browser()$reset()
 
-  rv$run_path <- NULL
+  rv$run_path <- '/path/to/example'
 
   rv_comp$runs_to_compare <- NULL
 

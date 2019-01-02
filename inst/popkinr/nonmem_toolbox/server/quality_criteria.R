@@ -31,7 +31,9 @@ output$qc_standard <- renderDataTable({
                                                                                      rv$run$model$covariates$name,
                                                                                      warn_missing = FALSE)))
 
-  qc_s <- qc %>% select(one_of(qc_cols)) %>% unnest() %>% rename("Maximal Error" = max_err,
+  qc_s <- qc %>% select(one_of(qc_cols)) %>% unnest() %>% rename("Observations" = n_observations,
+                                                                 "Maximal Error" = max_err,
+                                                                 "Absolute Average Fold Error" = aafe,
                                                                  "Average Fold Error" = afe)
 
   datatable(qc_s, options = list(paging = FALSE, info = FALSE, searching = FALSE), rownames = FALSE)
@@ -49,8 +51,8 @@ output$qc_bias <- renderDataTable({
 
   ci <- (1 - as.numeric(input$qc_alpha)) * 100
 
-  dots <- setNames(c("value", "ci_low", "ci_up", "relative_value"),
-                   nm = c("MPE (absolute)", paste(ci, "% CI (lower bound)"), paste(ci, "% CI (upper bound)"), "MPE (%)"))
+  dots <- setNames(c("n_observations", "value", "ci_low", "ci_up", "relative_value"),
+                   nm = c("Observations", "MPE (absolute)", paste(ci, "% CI (lower bound)"), paste(ci, "% CI (upper bound)"), "MPE (%)"))
 
   qc_b <- qc_b %>% rename(!!!dots)
 
@@ -70,8 +72,8 @@ output$qc_precision <- renderDataTable({
 
   ci <- (1 - as.numeric(input$qc_alpha)) * 100
 
-  dots <- setNames(c("value", "ci_low", "ci_up", "relative_value"),
-                   nm = c("RMSE (absolute)", paste(ci, "% CI (lower bound)"), paste(ci, "% CI (upper bound)"), "RMSE (%)"))
+  dots <- setNames(c("n_observations", "value", "ci_low", "ci_up", "relative_value"),
+                   nm = c("Observations", "RMSE (absolute)", paste(ci, "% CI (lower bound)"), paste(ci, "% CI (upper bound)"), "RMSE (%)"))
 
   qc_p <- qc_p %>% rename(!!!dots)
 

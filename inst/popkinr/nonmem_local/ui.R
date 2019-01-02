@@ -59,9 +59,9 @@ dashboardPage(
       ),
       h6(
         sprintf(
-          "PMXecute version: %s (%s)",
-          packageDescription("pmxecute")$Version,
-          packageDescription("pmxecute")$Date
+          "PopkinR version: %s (%s)",
+          packageDescription("popkinr")$Version,
+          packageDescription("popkinr")$Date
         )
       ),
       h6("Patrick Nolain, M&S Montpellier")
