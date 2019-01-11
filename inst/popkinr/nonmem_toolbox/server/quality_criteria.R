@@ -15,12 +15,10 @@ run_quality_criteria <- reactive({
 
 
 observe({
-  run_quality_criteria()
-
   build_pmxploit_qc_call()
-
 })
 
+# safe_eval <- safely(eval)
 build_pmxploit_qc_call <- function(){
   # Get run_quality_criteria function content
   qc_reactive_envir <- get_env(run_quality_criteria)
@@ -31,7 +29,15 @@ build_pmxploit_qc_call <- function(){
   qc_fn_envir <- get_env(qc_reactive_fn)
   qc_fn_body <- body(qc_reactive_fn)
 
-  eval(qc_fn_body, qc_fn_envir)
+  # sef <- safe_eval(qc_fn_body, qc_fn_envir)
+  #
+  # if(!is.null(sef$error)){
+  #   print("error")
+  #   return(NULL)
+  # }
+
+  # Remove last line from evaluation to prevent execution errors
+  eval(qc_fn_body[-length(qc_fn_body)], qc_fn_envir)
 
   # Extract the last line of the function
   # -> supposed to be a call to a pmxploit qc function

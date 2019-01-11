@@ -65,13 +65,17 @@
     split_by <- input$parameters_distributions_split_by
     only_baseline <- ifelse(input$parameters_values_type == 0, TRUE, FALSE)
 
-    req(all(parameters_selection %in% run$model$parameters$column))
+    req(all(parameters_selection %in% na.omit(run$model$parameters$id)))
 
     source_run <- if(only_baseline) filtered_run_reduced_baseline() else filtered_run_reduced()
 
     df <- source_run$tables$pmxploitab
 
-    cols <- c(split_by, parameters_selection)
+    param_col_names <- plyr::mapvalues(parameters_selection,
+                                       run$model$parameters$id,
+                                       run$model$parameters$column,
+                                       warn_missing = FALSE)
+    cols <- c(split_by, param_col_names)
 
     df <- df %>%
       select(ID, TIME, one_of(cols))
