@@ -1,5 +1,6 @@
 server <- function(input, output, session){
   options(shiny.deprecation.messages = FALSE)
+
   # options("shiny.fullstacktrace"=TRUE)
 
   session$onSessionEnded(function() {

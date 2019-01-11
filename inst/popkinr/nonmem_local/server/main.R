@@ -30,6 +30,8 @@ env_nm_call <- Sys.getenv("NM_CALL")
 env_nmcheck_exe <- Sys.getenv("NMCHECK_EXE")
 env_nmcheck_call <- Sys.getenv("NMCHECK_CALL")
 
+shinyjs::toggleState("perform_nmcheck", condition = file.exists(env_nmcheck_exe))
+
 env_nm_parafile_path <- Sys.getenv("NM_PARAFILE")
 env_popkin_monitor_path <- Sys.getenv("APP_PATH")
 env_popkin_root <- ifelse(Sys.getenv("BROWSER_ROOT") != "", Sys.getenv("BROWSER_ROOT"), "/")
