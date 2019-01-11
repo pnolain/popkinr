@@ -14,8 +14,8 @@ PMXplore `popkinr::dataset_exploration`
 
 ....
 
-PMXecute `popkinr::nonmem_local`
---------------------------------
+PMXecute `popkinr::nonmem_monitor`
+----------------------------------
 
 ....
 

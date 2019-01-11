@@ -25,7 +25,7 @@ PopkinR contains `shiny` applications for:
 
 ....
 
-## PMXecute `popkinr::nonmem_local`
+## PMXecute `popkinr::nonmem_monitor`
 
 ....
 
