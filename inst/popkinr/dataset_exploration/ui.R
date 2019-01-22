@@ -67,9 +67,9 @@ shinyUI(
                          box(
                            title = "Dataset download ", width = 12,
                            #Selector for file upload
-                           fileInput('datafile', 'Choose .CSV / .DAT dataset',
-                                     accept=c('text/csv', 'text/comma-separated-values,text/plain')),
-                           actionLink("click_browse", "Browse..."),
+                           # fileInput('datafile', 'Choose .CSV / .DAT dataset',
+                           #           accept=c('text/csv', 'text/comma-separated-values,text/plain')),
+                           actionLink("click_browse", "Browse..."),br(),br(),
                            br(),
                            actionLink("Demo","Demo dataset",icon("edit"))
                          ),
@@ -302,6 +302,8 @@ shinyUI(
                       uiOutput("NCA_cmt_dose_choice"),
                       uiOutput("NCA_cmt_conc_choice"),
                       uiOutput("NCA_TimeVar"),
+                      numericInput("Conv.factor", "AMT/DV conversion factor", value=1, step=10),
+                      h6("eg: for AMT in mg and DV in µg/L, Conversion factor=1000"),
                       radioButtons("dose.choice","Dose choice : ",choices=c("First","Last","Other"),inline = T),
                       numericInput("NCA_dosenumber","Choose dose number:",value=2,min=2,step=1),
                       uiOutput("NCA_DVchoice"),
