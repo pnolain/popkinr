@@ -67,8 +67,7 @@ if(has_filters)
 qc_cols <- intersect(colnames(qc), c("n_observations", "standard", group_cols))
 
 qc_s <- qc %>% select(one_of(qc_cols)) %>% unnest() %>% rename("Maximal Error" = max_err,
-                                                               "Absolute Average Fold Error" = aafe,
-                                                               "Average Fold Error" = afe)
+                                                               "Absolute Average Fold Error" = aafe)
 
 knitr::kable(qc_s, align = "c")
 ```

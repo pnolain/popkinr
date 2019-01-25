@@ -155,8 +155,7 @@ output$qc_standard <- renderDataTable({
 
   qc_s <- qc %>% select(one_of(qc_cols)) %>% unnest() %>% rename("Observations" = n_observations,
                                                                  "Maximal Error" = max_err,
-                                                                 "Absolute Average Fold Error" = aafe,
-                                                                 "Average Fold Error" = afe)
+                                                                 "Absolute Average Fold Error" = aafe)
 
   datatable(qc_s, options = list(paging = FALSE, info = FALSE, searching = FALSE), rownames = FALSE)
 })
