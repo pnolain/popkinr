@@ -11,6 +11,8 @@ serverBrowserUI <- function(id, max_height = "600px"){
 
   ns <- NS(id)
 
+  shinyjs::inlineCSS("#browser_container.waiting, #browser_container.waiting * { cursor: wait; }")
+
   div(
     fluidRow(
       column(3,

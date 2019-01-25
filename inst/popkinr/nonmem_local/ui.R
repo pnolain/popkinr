@@ -2,7 +2,28 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(shinyjs)
+library(R6)
 library(shinytoastr)
+
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(xml2)
+library(stringr)
+library(purrr)
+library(readr)
+library(lubridate)
+library(hms)
+
+library(pmxploit)
+library(pmxecute)
+
+library(future)
+library(promises)
+#plan(multicore) # forked R processes
+#plan(multisession) # background R sessions
+plan(multiprocess) # multicore if supported, otherwise multisession
+# plan(sequential)
 
 source("modules/controlStreamUI.R")
 source("modules/serverbrowser.R")
