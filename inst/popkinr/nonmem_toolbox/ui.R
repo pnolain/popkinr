@@ -1306,13 +1306,7 @@ dashboardPage(
                                        tags$li(
                                          "Absolute Average Fold Error:",
                                          withMathJax(
-                                           '$$AAFE=10^{\\dfrac{1}{N}{\\sum_{i=1}^N{|log(\\dfrac{obs_i}{pred_i}) |}}}$$'
-                                         )
-                                       ),
-                                       tags$li(
-                                         "Average Fold Error:",
-                                         withMathJax(
-                                           '$$AFE=10^{\\dfrac{1}{N}{\\sum_{i=1}^N{log(\\dfrac{pred_i}{obs_i})}}}$$'
+                                           '$$AAFE=10^{\\dfrac{1}{N}{\\sum_{i=1}^N{|log(\\dfrac{pred_i}{obs_i}) |}}}$$'
                                          )
                                        ),
                                        tags$li("MPE (absolute)",

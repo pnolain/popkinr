@@ -95,7 +95,7 @@ output$selected_dv_vs_pred_data <- renderDataTable({
   if(nrow(df) > 0) {
     df <- df %>% mutate(n = row_number()) %>%  spread(X, X_Value) %>% spread(Y, Y_Value) %>% select(-n)
   } else {
-    df <- data_frame(ID = numeric(), TIME = numeric(), CMT = numeric())
+    df <- tibble(ID = numeric(), TIME = numeric(), CMT = numeric())
   }
 
   datatable(df, options = list(pageLength = 20, dom = 'rtip'))
@@ -116,7 +116,7 @@ output$selected_spaghetti_data <- renderDataTable({
       df <- df %>% select(-one_of(paste(input$diagnostic_split_by, collapse = ".")))
     }
   }else {
-    df <- data_frame(ID = numeric(), TIME = numeric(), CMT = numeric())
+    df <- tibble(ID = numeric(), TIME = numeric(), CMT = numeric())
   }
 
   datatable(df, options = list(pageLength = 20, dom = 'rtip'))
@@ -124,7 +124,7 @@ output$selected_spaghetti_data <- renderDataTable({
 })
 output$selected_residuals_data <- renderDataTable({
 
-  df <- data_frame(ID = numeric(), CMT = numeric())
+  df <- tibble(ID = numeric(), CMT = numeric())
 
   data<- req(run_residuals_plot()$data)
 
@@ -179,7 +179,7 @@ output$selected_residuals_data <- renderDataTable({
       norm_quantiles$res <- data$Residuals_Value
 
 
-      selected_subjects <- data_frame(ID = numeric())
+      selected_subjects <- tibble(ID = numeric())
 
       brush$mapping[panel_names] <- NULL
 

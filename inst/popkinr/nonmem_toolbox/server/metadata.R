@@ -71,7 +71,7 @@ output$selected_categorical_covariate_metadata <- renderRHandsontable({
   values <- run$model$categorical_covariates_levels[[selected_cov]]
   labels <- names(values)
 
-  df <- data_frame(value = values,
+  df <- tibble(value = values,
                    label = labels) %>%
     arrange(as.character(value))
 

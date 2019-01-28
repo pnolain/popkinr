@@ -303,7 +303,7 @@ open_run <- function(run_path){
 
   if(length(run_load$warnings) > 0){
     app_warnings <- map_df(run_load$warnings, function(x){
-      data_frame(message = x, status = "warning")
+      tibble(message = x, status = "warning")
     }, .id = NULL)
 
     notifs <- app_warnings
@@ -311,7 +311,7 @@ open_run <- function(run_path){
 
   if(length(run_load$result$error) > 0){
     app_errors <- map_df(run_load$result$error$message, function(x){
-      data_frame(message = x, status = "error")
+      tibble(message = x, status = "error")
     }, .id = NULL)
 
     notifs <- bind_rows(notifs, app_errors)
@@ -515,7 +515,7 @@ filtered_run_reduced <- reactive({
 })
 
 reset_filters <- function(){
-  rv$app_filters <- list(quo(MDV == 0))#data_frame(column = "MDV", operator = "==", value = 0)
+  rv$app_filters <- list(quo(MDV == 0))
 }
 
 reset_ui<-function(){
@@ -625,7 +625,6 @@ observeEvent(input$add_filter,{
   op <- input$filter_operator
   col <- input$filter_columns
 
-  #new_filter <- data_frame(column = input$filter_columns, operator = input$filter_operator, value = val)
   filter_formula <- switch(as.character(val),
                            `NA` = {
                              switch(as.character(op),

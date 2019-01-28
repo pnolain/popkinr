@@ -258,7 +258,7 @@
 
     brush <- input[[ns("brush")]]
 
-    selected_subjects <- data_frame(ID = numeric())
+    selected_subjects <- tibble(ID = numeric())
 
     if(!is.null(brush)){
       if(all(c(data$a$name, data$b$name) %in% c(brush$mapping$x, brush$mapping$y))){
@@ -605,7 +605,7 @@
 
     brush <- input[[ns("brush")]]
 
-    selected_subjects <- data_frame(ID = numeric())
+    selected_subjects <- tibble(ID = numeric())
 
     if(!is.null(brush)){
       if(all(c(data$a$name, data$b$name) %in% c(brush$mapping$x, brush$mapping$y))){
@@ -823,7 +823,7 @@
 
     brush <- input[[ns("brush")]]
 
-    selected_subjects <- data_frame(ID = numeric())
+    selected_subjects <- tibble(ID = numeric())
 
     if(!is.null(brush)){
       if(all(c(data$parameter$name, data$covariate$name) %in% c(brush$mapping$x, brush$mapping$y))){

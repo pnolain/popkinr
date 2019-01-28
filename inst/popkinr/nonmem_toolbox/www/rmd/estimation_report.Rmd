@@ -33,7 +33,7 @@ n_estimation <- params$estimation_number
 ```
 
 ```{r base info}
-base_info_df <- data_frame(ID = run$info$run_id,
+base_info_df <- tibble(ID = run$info$run_id,
                            `CONTROL STREAM` = run$info$control_stream_file,
                            `DATASET` = run$info$dataset_file,
                            `OBSERVATIONS` = run$info$number_of_observations,
@@ -48,7 +48,7 @@ knitr::kable(gather(base_info_df), caption = "Base info", col.names = c("", ""))
 ```{r run info}
 est <- run$estimations[[n_estimation]]
 
-est_df <- data_frame(`ESTIMATION STEP` = sprintf("%s of %s", n_estimation, length(run$estimations)),
+est_df <- tibble(`ESTIMATION STEP` = sprintf("%s of %s", n_estimation, length(run$estimations)),
                      METHOD = est$title,
                      STATUS = ifelse(est$failed, "Failed",
                                      ifelse(!est$minimization,

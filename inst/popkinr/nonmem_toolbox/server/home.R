@@ -40,22 +40,21 @@ output$estimations_table <- renderDataTable({
     run <- req(rv$run)
 
     est_table <- map_df(run$estimations, function(est){
-      data_frame(#N = est$number,
-        Method = est$title,
-        Minimization = ifelse(est$failed, "Failed",
-                              ifelse(!est$minimization, "No minimization",
-                                     ifelse(est$termination_status == 0, "Successful", "Terminated"))),
-        `Final OFV` = est$final_ofv,
-        Eigenratio = est$eigenratio,
-        Correlation = est$correlation,
-        AIC = est$aic,
-        BIC = est$bic,
-        `CPU` = ifelse(!is.null(est$parallel), est$parallel$nodes, 1),
-        `Significant digits` = est$significant_digits,
-        `Function evaluations` = est$nfuncevals,
-        Messages = ifelse(!is.null(est$termination_messages),
-                          paste(est$termination_messages$message, collapse = "<br />"),
-                          NA))
+      tibble(Method = est$title,
+             Minimization = ifelse(est$failed, "Failed",
+                                   ifelse(!est$minimization, "No minimization",
+                                          ifelse(est$termination_status == 0, "Successful", "Terminated"))),
+             `Final OFV` = est$final_ofv,
+             Eigenratio = est$eigenratio,
+             Correlation = est$correlation,
+             AIC = est$aic,
+             BIC = est$bic,
+             `CPU` = ifelse(!is.null(est$parallel), est$parallel$nodes, 1),
+             `Significant digits` = est$significant_digits,
+             `Function evaluations` = est$nfuncevals,
+             Messages = ifelse(!is.null(est$termination_messages),
+                               paste(est$termination_messages$message, collapse = "<br />"),
+                               NA))
     }, .id = NULL) %>%
       mutate_if(is.numeric, ~ round(., 2))
 
