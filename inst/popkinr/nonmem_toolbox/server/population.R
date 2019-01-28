@@ -312,8 +312,8 @@
   output$correlation_box <- renderInfoBox({
     selected_est <- req(rv$selected_estimation)
 
-    if(!is.null(selected_est$max_correlation)) {
-      infoBox("Correlation", signif(selected_est$max_correlation, 3), color = "green", icon = icon("calculator"))
+    if(!is.null(selected_est$correlation)) {
+      infoBox("Correlation", selected_est$correlation, color = "green", icon = icon("calculator"))
     } else {
       infoBox("Correlation", "-", color = "green", icon = icon("calculator"))
     }

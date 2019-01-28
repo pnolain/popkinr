@@ -47,7 +47,7 @@ output$estimations_table <- renderDataTable({
                                      ifelse(est$termination_status == 0, "Successful", "Terminated"))),
         `Final OFV` = est$final_ofv,
         Eigenratio = est$eigenratio,
-        `Maximum correlation` = signif(selected_est$max_correlation, 3),
+        Correlation = selected_est$correlation,
         AIC = est$aic,
         BIC = est$bic,
         `CPU` = ifelse(!is.null(est$parallel), est$parallel$nodes, 1),
