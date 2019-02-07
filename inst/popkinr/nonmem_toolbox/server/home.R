@@ -98,7 +98,7 @@ output$estimations_table <- renderDataTable({
     run <- req(rv$run)
     dur <- run$info$duration
 
-    infoBox("Run duration", value = lubridate::seconds_to_period(dur),
+    infoBox("Run duration", value = lubridate::seconds_to_period(round(dur)),
             color = "green", icon = icon("hourglass-end"))
   })
 

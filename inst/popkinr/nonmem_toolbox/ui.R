@@ -240,8 +240,8 @@ dashboardPage(
           ),
           box(
             width = 6,
-            title = "Regressors",
-            rHandsontableOutput("regressors_metadata")
+            title = "Independent variables",
+            rHandsontableOutput("idv_metadata")
           ),
           box(
             width = 12,
@@ -294,7 +294,7 @@ dashboardPage(
                 actionButton("add_to_parameters", "Individual parameters"),
                 actionButton("add_to_categorical_cov", "Categorical covariates"),
                 actionButton("add_to_continuous_cov", "Continuous covariates"),
-                actionButton("add_to_regressors", "Regressors")
+                actionButton("add_to_idv", "Independent variables")
 
               )
             )
@@ -530,7 +530,7 @@ dashboardPage(
                     value = "spaghetti_tab",
                     title = "Spaghetti plot",
                     flowLayout(
-                      uiOutput("spaghetti_regressor"),
+                      uiOutput("spaghetti_idv"),
                       checkboxInput("spaghetti_split_facets", "Splits by facets", value = TRUE),
                       checkboxInput(
                         "spaghetti_split_means",
@@ -608,7 +608,7 @@ dashboardPage(
                     fluidRow(
                       column(
                         2,
-                        uiOutput("indiv_regressor"),
+                        uiOutput("indiv_idv"),
                         selectInput(
                           "individual_layout",
                           "Layout",

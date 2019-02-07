@@ -16,10 +16,10 @@ output$dv_vs_pred_type <- renderUI({
 })
 
 
-output$indiv_regressor <- renderUI({
+output$indiv_idv <- renderUI({
   run <- req(rv$run)
 
-  selectInput("indiv_regressor", "X-axis", choices = set_names(run$model$regressors$column, run$model$regressors$name))
+  selectInput("indiv_idv", "X-axis", choices = set_names(run$model$independent_variables$column, run$model$independent_variables$name))
 })
 
 output$indiv_cat_cov <- renderUI({
@@ -46,7 +46,7 @@ output$indiv_pred_type <- renderUI({
 output$res_x_type <- renderUI({
   run <- req(rv$run)
 
-  res_x_names <- req(c(run$model$regressors$column, run$model$predictions))
+  res_x_names <- req(c(run$model$independent_variables$column, run$model$predictions))
 
   def_selection <- intersect(res_x_names, c("TIME", "PRED"))
 
@@ -322,7 +322,7 @@ build_all_individual_profiles_plot <- function(filepath){
                                  predictions = req(input$indiv_pred_type),
                                  categorical_covariate = cat_cov,
                                  log_dv = input$diag_log_dv,
-                                 regressor = req(input$indiv_regressor),
+                                 idv = req(input$indiv_idv),
                                  show_observations = input$show_observations,
                                  predictions_dots = input$predictions_dots,
                                  x_scale = input$plots_x_scale,
@@ -472,7 +472,7 @@ run_spaghetti_plot <- reactive({
     group_by(UQS(grps)) %>%
     plot_observed_profiles(compartment = selected_cmt,
                            ids = ids,
-                           regressor = req(input$spaghetti_regressor),
+                           idv = req(input$spaghetti_idv),
                            log_dv = input$diag_log_dv,
                            facetted = input$spaghetti_split_facets,
                            facet_scales = input$facet_scales,
@@ -483,10 +483,10 @@ run_spaghetti_plot <- reactive({
                            transparency = input$transparency)
 })
 
-output$spaghetti_regressor <- renderUI({
+output$spaghetti_idv <- renderUI({
   run <- req(rv$run)
 
-  selectInput("spaghetti_regressor", "X-axis", set_names(run$model$regressors$column, run$model$regressors$name))
+  selectInput("spaghetti_idv", "X-axis", set_names(run$model$independent_variables$column, run$model$independent_variables$name))
 })
 
 run_residuals_plot <- reactive({
@@ -517,7 +517,7 @@ run_residuals_plot <- reactive({
 filtered_run() %>%
     group_by(UQS(grps)) %>%
     plot_residuals(compartment = selected_cmt,
-                   regressor = req(input$res_x_type), residuals = req(input$res_y_type),
+                   idv = req(input$res_x_type), residuals = req(input$res_y_type),
                    absolute_residuals = abs_res,
                    histogram_bins = input$residuals_hist_bins,
                    histogram_empirical_density = input$residuals_histogram_empirical_density,
@@ -573,7 +573,7 @@ run_individuals_plot <- reactive({
                              predictions = req(input$indiv_pred_type),
                              categorical_covariate = cat_cov,
                              log_dv = input$diag_log_dv,
-                             regressor = req(input$indiv_regressor),
+                             idv = req(input$indiv_idv),
                              show_observations = input$show_observations,
                              predictions_dots = input$predictions_dots,
                              x_scale = input$plots_x_scale,

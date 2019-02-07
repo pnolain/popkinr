@@ -146,7 +146,7 @@
 
       df <- run$tables$pmxploitab %>%
         semi_join(b_df, by = join_cols) %>%
-        select(ID, CMT, one_of(res_type, run$model$regressors$column))
+        select(ID, CMT, one_of(res_type, run$model$independent_variables$column))
     }
 
     datatable(df, options = list(pageLength = 20, dom = 'rtip', scrollX = TRUE))
