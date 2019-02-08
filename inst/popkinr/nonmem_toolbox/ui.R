@@ -1503,7 +1503,8 @@ dashboardPage(
                   tags$div(
                     align = "center",
                     actionButton("generate_control_stream", "Generate control stream")
-                  )
+                  ),
+                  uiOutput("vpc_location")
                 ),
                 tabBox(
                   width = 12,
@@ -1514,6 +1515,7 @@ dashboardPage(
                                     fluidRow(
                                       column(
                                         6,
+                                        uiOutput("vpc_idv"),
                                         uiOutput("vpc_cmt"),
                                         checkboxInput("vpc_correction", "Prediction-correction", value = FALSE),
                                         sliderInput(

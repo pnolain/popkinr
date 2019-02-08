@@ -16,6 +16,10 @@ output$nmcheck_exe <- renderUI({
   textInput("nmcheck_exe", "NM-TRAN check executable", nmcheck_exe)
 })
 
+output$vpc_location <- renderUI({
+  h6("*NONMEM raw outputs will be located at:", app_temp_vpc_directory)
+})
+
 output$vpc_cmt <- renderUI({
   # keep currently selected compartment
   current_selection <- isolate(input$cmt)
@@ -23,6 +27,12 @@ output$vpc_cmt <- renderUI({
   cmt_choices <- req(run_dv_cmts())
 
   selectInput("vpc_cmt", "Selection", choices = cmt_choices, selected = current_selection)
+})
+
+output$vpc_idv <- renderUI({
+  run <- req(rv$run)
+
+  selectInput("vpc_idv", "Independent variable", set_names(run$model$independent_variables$column, run$model$independent_variables$name))
 })
 
 strat_columns <- reactive({
@@ -173,7 +183,9 @@ observeEvent(input$vpc_run, {
     files_to_copy <- c(run$control_stream$dataset_file, extra_files)
 
     if(length(files_to_copy) > 0){
-      if(file.info(run$info$path)$isdir){
+      if(run$info$path == "/pmxploit/example/TMDD_Djebli_al"){ # run demo
+        write_csv(run$tables$dataset, path = str_c(app_temp_vpc_directory, "/", run$control_stream$dataset_file), na = ".")
+      } else if(file.info(run$info$path)$isdir){
         file.copy(str_c(run$info$path, files_to_copy, sep = "/"),
                   app_temp_vpc_directory)
       } else {
@@ -386,6 +398,8 @@ run_vpcdb <- reactive({
 
   vpcdb <- vpc(sim = sim_df,
                obs = obs_df,
+               obs_cols = list(idv = input$vpc_idv),
+               sim_cols = list(idv = input$vpc_idv),
                stratify = strat_cols,
                bins = input$vpc_binning,
                n_bins = ifelse(is.na(input$vpc_n_bins), "auto", input$vpc_n_bins),
