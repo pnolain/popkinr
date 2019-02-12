@@ -83,13 +83,15 @@
     list(test = ks,
          residual = res,
          mean = mean(values),
-         sd = sd(values))
+         sd = sd(values),
+         N = length(values),
+         `N unique` = length(unique(values)))
   })
 
   output$outliers_ks_table <- renderDataTable({
     ks <- req(outliers_ks_test())
 
-    stats_df <- tibble(mean = ks$mean, sd = ks$sd) %>%
+    stats_df <- tibble(mean = ks$mean, sd = ks$sd, N = ks$N, `N unique` = ks$`N unique`) %>%
       rename(!!!setNames(nm = sprintf("%s (%s)", ks$res, colnames(.)), colnames(.)))
 
     test_df <- broom::tidy(ks$test) %>%

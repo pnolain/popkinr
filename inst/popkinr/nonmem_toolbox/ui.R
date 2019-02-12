@@ -144,13 +144,10 @@ dashboardPage(
     div(
       id = "loading-content",
       img(
-        src = "media/pmxploit.svg",
-        width = 175,
-        height = 175
-      ),
-      br(),
-      br(),
-      img(src = "media/balls.svg")
+        src = "media/pmxploit_animated.svg",
+        width = 200,
+        height = 200
+      )
     ),
     tabItems(
       tabItem(tabName = "home",
