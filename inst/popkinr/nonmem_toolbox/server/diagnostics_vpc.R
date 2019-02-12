@@ -198,7 +198,7 @@ observeEvent(input$vpc_run, {
       }
     }
 
-    pmxecute::nm_exec(control_file = str_c(app_temp_vpc_directory, "vpc.ctl", sep = "/"),
+    pmxploit::nm_exec(control_file = str_c(app_temp_vpc_directory, "vpc.ctl", sep = "/"),
                    run_directory = str_c(app_temp_vpc_directory, "run", sep = "/"),
                    nonmem_exe = nm_exe,
                    call_template = env_nm_call,
@@ -379,18 +379,20 @@ run_vpcdb <- reactive({
     }
   }
 
+  browser()
+  idv <- input$vpc_idv
 
-  is_time <- is.hms(obs_df$TIME)
+  is_time <- is.hms(obs_df[idv])
 
-  # prevent TIME column from being in "time" format before calling vpc function
+  # prevent IDV column from being in "time" format before calling vpc function
   if (is_time) {
-    # Fix TIME column with dataset times
+    # Fix IDV column with dataset times
     sim_df <- sim_df %>%
-      select(-TIME) %>%
-      left_join(select(obs_df, ID, TIME), by = "ID") %>%
-      select(REP, ID, TIME, everything())
+      select(-one_of(idv)) %>%
+      left_join(select(obs_df, ID, one_of(idv)), by = "ID") %>%
+      select(REP, ID, one_of(idv), everything())
 
-    # Convert TIME to numeric
+    # Convert IDV to numeric
     sim_df <- sim_df %>% mutate(TIME = as.numeric(TIME))
     obs_df <- obs_df %>% mutate(TIME = as.numeric(TIME))
   }

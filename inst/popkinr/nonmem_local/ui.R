@@ -19,7 +19,6 @@ library(lubridate)
 library(hms)
 
 library(pmxploit)
-library(pmxecute)
 
 library(future)
 library(promises)

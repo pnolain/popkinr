@@ -18,7 +18,6 @@ suppressPackageStartupMessages({
   library(broom)
   library(future)
   library(pmxploit)
-  library(pmxecute)
   library(rlang)
   library(xml2)
   library(vpc)
