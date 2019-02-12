@@ -324,7 +324,7 @@ build_all_individual_profiles_plot <- function(filepath){
                                  log_dv = input$diag_log_dv,
                                  idv = req(input$indiv_idv),
                                  show_observations = input$show_observations,
-                                 predictions_dots = input$predictions_dots,
+                                 predictions_dots = as.logical(input$predictions_dots),
                                  x_scale = input$plots_x_scale,
                                  y_scale = input$plots_y_scale,
                                  facet_scales = input$facet_scales,
