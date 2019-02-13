@@ -912,7 +912,8 @@ shinyServer(function(input, output){
       fill_columns <-if (input$ColOption==T){input$fillcol} else {df %>% names()%>% setdiff(c("AMT", "DV", "RATE", "SS", "II", "ADDL"))}
     })
     withProgress({
-      values$rich_df<- df %>% enrich_dataset(periods=pr , columns_to_fill = fill_columns)
+      values$rich_df<- if (isTRUE(exists("df$CMT"))){df %>% enrich_dataset(periods=pr , columns_to_fill = fill_columns)}
+                        else {df %>% mutate(CMT=1 ) %>% enrich_dataset(periods=pr , columns_to_fill = fill_columns)}
       setProgress(value = 1, message = "Done !")
     }, value = 0.5, message = "Creating new dataset...")
 
