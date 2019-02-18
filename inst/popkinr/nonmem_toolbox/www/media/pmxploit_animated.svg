@@ -27,6 +27,10 @@
   transform-origin: 530px 370px;
   -webkit-animation: rotation 1s infinite linear;
 }
+#g5123{
+  transform-origin: 100px 380px;
+  -webkit-animation: rotation2 0.5s infinite alternate;
+}
 
 @-webkit-keyframes rotation {
 		from {
@@ -34,6 +38,15 @@
 		}
 		to {
 				-webkit-transform: rotate(359deg);
+		}
+}
+
+@-webkit-keyframes rotation2 {
+		from {
+				-webkit-transform: rotate(0deg);
+		}
+		to {
+				-webkit-transform: rotate(-30deg);
 		}
 }
 </style>

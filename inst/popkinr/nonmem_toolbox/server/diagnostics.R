@@ -151,7 +151,7 @@ output$selected_residuals_data <- renderDataTable({
 
       if(nrow(df)>0){
         df <- df %>% mutate(n = row_number()) %>%
-          spread(Regressor, Regressor_Value) %>%
+          spread(idv, idv_Value) %>%
           spread(Residuals, Residuals_Value) %>%
           select(-n)
       }
