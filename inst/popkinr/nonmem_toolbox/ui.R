@@ -1464,7 +1464,7 @@ dashboardPage(
                     "Based on the run estimation results, a control stream is generated to perform simulations for Visual Predictive Checks."
                   ),
                   br(),
-                  tags$strong("Steps:"),
+                  tags$strong("The following must be performed to generate VPC:"),
                   tags$ol(
                     tags$li("Set the local paths to NONMEM and NMTRAN check executables"),
                     tags$li("Set number of simulations and seed"),
@@ -1473,7 +1473,10 @@ dashboardPage(
                       "Run simulations locally using NONMEM (do not close the application until computation is finished)"
                     )
                   ),
-
+                  br(),
+                  tags$div("The VPC plots and data are then computed by the ", tags$strong("vpc"),
+                           " R package (docs: ", tags$a(href = "http://vpc.ronkeizer.com/", target = "_blank", "http://vpc.ronkeizer.com/"), ")")
+                  ,
                   fluidRow(column(
                     8,
                     h4("NONMEM paths"),

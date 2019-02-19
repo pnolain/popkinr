@@ -178,7 +178,7 @@ observeEvent(input$vpc_run, {
     }
 
     # Move original files: dataset and extra files (custom subroutines)
-    extra_files <- c(run$control_stream$subroutine$FILES, run$control_stream$extra_files)
+    extra_files <- unique(c(run$control_stream$subroutine$FILES, run$control_stream$extra_files))
 
     files_to_copy <- c(run$control_stream$dataset_file, extra_files)
 
