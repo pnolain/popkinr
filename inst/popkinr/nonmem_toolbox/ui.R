@@ -1041,8 +1041,6 @@ dashboardPage(
                     align = "center",
                     actionButton("categorical_covariates_refresh", "Refresh")
                   ),
-
-                  # uiOutput("categorical_covariates_distributions_split_by"),
                   flowLayout(
                     selectInput(
                       "categorical_covariates_show_frequency",
@@ -1114,7 +1112,6 @@ dashboardPage(
                     ),
                     column(
                       width = 8,
-                      #uiOutput("selected_parameters"),
                       selectizeInput(
                         "p_c_selected_parameters",
                         "Parameters selection",
@@ -1127,7 +1124,6 @@ dashboardPage(
                       ),
                       conditionalPanel(
                         condition = "input.covariates_type_tab == 'continuous_tab'",
-                        #uiOutput("selected_continuous_covariates")
                         selectizeInput(
                           "p_c_selected_continuous_covariates",
                           "Continuous covariates selection",
@@ -1141,7 +1137,6 @@ dashboardPage(
                       ),
                       conditionalPanel(
                         condition = "input.covariates_type_tab == 'categorical_tab'",
-                        #uiOutput("selected_categorical_covariates")
                         selectizeInput(
                           "p_c_selected_categorical_covariates",
                           "Categorical covariates selection",
@@ -1601,15 +1596,6 @@ dashboardPage(
                                     extendedDTUI("vpc_db_table", title = "VPC summary data"),
                                     extendedDTUI("vpc_obs_table", title = "Observations"),
                                     extendedDTUI("vpc_sim_table", title = "VPC Simulations"))
-                             # column(
-                             #   4,
-                             # ),
-                             # column(
-                             #   4,
-                             # ),
-                             # column(
-                             #   4,
-                             # )
                            ))
                 )
               )),
@@ -1669,7 +1655,6 @@ dashboardPage(
                         2,
                         downloadButton("export_comparison_table", "Export")
                       )),
-                      #DT::dataTableOutput("comparison_table")
                       extendedDTUI("comparison_table")
                     ),
                     tabPanel("Plots",
@@ -1725,16 +1710,6 @@ dashboardPage(
                       checkboxInput("comparison_stats_table_rse", "RSE", value = FALSE),
                       extendedDTUI("comparison_stats_table")
                     )
-                    # ,
-                    # tabPanel("Quality criteria",
-                    #          uiOutput("qc_comparison_pred_type"),
-                    #          actionButton("compute_qc_comparison", "Compare quality criteria"),
-                    #          h4("Standard QC"),
-                    #          DT::dataTableOutput("qc_comparison_standard"),
-                    #          h4("Bias (Mean Prediction Error)"),
-                    #          DT::dataTableOutput("qc_comparison_bias"),
-                    #          h4("Precision (Root Mean Square Error)"),
-                    #          DT::dataTableOutput("qc_comparison_precision"))
                   )
                 )
               )),
