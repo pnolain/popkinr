@@ -56,69 +56,69 @@ comparison_browser <- callModule(popkinr::serverBrowser, "comparison_browser",
                                  formatting_function = run_browser_formatting)
 
 # table modules----
-callModule(extendedDTnew, "thetas_table", reactive_table = reactive(run_thetas_table()), filename = "THETAs")
-callModule(extendedDTnew, "omega_table", reactive_table = reactive(run_omega_table()), filename = "OMEGA")
-callModule(extendedDTnew, "eta_bars_table", reactive_table = reactive(run_eta_bars_table()), filename = "ETA-bars")
-callModule(extendedDTnew, "sigma_table", reactive_table = reactive(run_sigma_table()), filename = "SIGMA")
-callModule(extendedDTnew, "eta_shrinkage_table", reactive_table = reactive(run_eta_shrinkage_table()), filename = "ETA-shrinkage")
-callModule(extendedDTnew, "eps_shrinkage_table", reactive_table = reactive(run_eps_shrinkage_table()), filename = "EPS-shinkage")
+callModule(extendedDT, "thetas_table", reactive_table = reactive(run_thetas_table()), filename = "THETAs")
+callModule(extendedDT, "omega_table", reactive_table = reactive(run_omega_table()), filename = "OMEGA")
+callModule(extendedDT, "eta_bars_table", reactive_table = reactive(run_eta_bars_table()), filename = "ETA-bars")
+callModule(extendedDT, "sigma_table", reactive_table = reactive(run_sigma_table()), filename = "SIGMA")
+callModule(extendedDT, "eta_shrinkage_table", reactive_table = reactive(run_eta_shrinkage_table()), filename = "ETA-shrinkage")
+callModule(extendedDT, "eps_shrinkage_table", reactive_table = reactive(run_eps_shrinkage_table()), filename = "EPS-shinkage")
 
 
-callModule(extendedDT, "parameters_individual_table", reactive_table = reactive(individual_parameters()),
+callModule(extendedDT, buttons = FALSE, "parameters_individual_table", reactive_table = reactive(individual_parameters()),
            rownames = FALSE,
            filename = "individual_parameters", options = list(pageLength = 20, dom = 'ip'))
-callModule(extendedDTnew, "parameters_distributions_summary", reactive_table = reactive(run_parameters_summary_table()),
+callModule(extendedDT, "parameters_distributions_summary", reactive_table = reactive(run_parameters_summary_table()),
            rownames = FALSE,
            filename = "parameters_summary", options = list(paging = FALSE))
 
-callModule(extendedDT, "continuous_covariates_individual_table", reactive_table = reactive(continuous_covariates()),
+callModule(extendedDT, buttons = FALSE, "continuous_covariates_individual_table", reactive_table = reactive(continuous_covariates()),
            rownames = FALSE,
            filename = "individual_continuous_covariates", options = list(pageLength = 20, dom = 'ip'))
-callModule(extendedDT, "continuous_covariates_distributions_summary",
+callModule(extendedDT, buttons = FALSE, "continuous_covariates_distributions_summary",
            reactive_table = reactive(run_continuous_covariates_summary_table()),
            rownames = FALSE,
            filename = "continuous_covariates_summary", options = list(paging = FALSE))
 
-callModule(extendedDT, "categorical_covariates_individual_table", reactive_table = reactive(categorical_covariates()),
+callModule(extendedDT, buttons = FALSE, "categorical_covariates_individual_table", reactive_table = reactive(categorical_covariates()),
            rownames = FALSE,
            filename = "individual_categorical_covariates", options = list(pageLength = 20, dom = 'ip'))
-callModule(extendedDT, "categorical_covariates_distributions_summary", reactive_table = reactive(run_categorical_covariates_summary_table()),
+callModule(extendedDT, buttons = FALSE, "categorical_covariates_distributions_summary", reactive_table = reactive(run_categorical_covariates_summary_table()),
            rownames = FALSE,
            filename = "categorical_covariates_summary", options = list(paging = FALSE))
 
-callModule(extendedDT, "comparison_table", reactive_table = reactive(run_comparison_table()),
+callModule(extendedDT, buttons = FALSE, "comparison_table", reactive_table = reactive(run_comparison_table()),
            filename = "comparison",
            digits = 6)
 
-callModule(extendedDT, "comparison_stats_table", reactive_table = reactive(comparison_statistics()),
+callModule(extendedDT, buttons = FALSE, "comparison_stats_table", reactive_table = reactive(comparison_statistics()),
            filename = "comparison_statistics", escape = FALSE, rownames = FALSE,
            options = list(scrollX = TRUE, paging = FALSE))
 
 
-callModule(extendedDT, "run_table_output", reactive_table = reactive(run_selected_table()),
+callModule(extendedDT, buttons = FALSE, "run_table_output", reactive_table = reactive(run_selected_table()),
            filename = "run_table", escape = FALSE, rownames = FALSE,
            options = list(pageLength = 50, scrollX = TRUE, dom = 'ip'))
 
-callModule(extendedDT, "outliers_grubbs_table",
+callModule(extendedDT, buttons = FALSE, "outliers_grubbs_table",
            reactive_table = reactive(outliers_grubbs_detection()$outliers),
            filename = "outliers_grubbs", options = list(pageLength = 20, dom = 'ip'))
 
-callModule(extendedDT, "outliers_boxplot_table",
+callModule(extendedDT, buttons = FALSE, "outliers_boxplot_table",
            reactive_table = reactive(outliers_boxplot_detection()$outliers),
            filename = "outliers_boxplot", options = list(pageLength = 20, dom = 'ip'))
 
 
-callModule(extendedDT, "vpc_sim_table",
+callModule(extendedDT, buttons = FALSE, "vpc_sim_table",
            reactive_table = reactive(vpc_sim_table()),
            filename = "vpc_simulated_ouput", rownames = FALSE,
            options = list(scrollX = TRUE, pageLength = 10, dom = 'ip'))
 
-callModule(extendedDT, "vpc_obs_table",
+callModule(extendedDT, buttons = FALSE, "vpc_obs_table",
            reactive_table = reactive(vpc_obs_table()),
            filename = "vpc_obs_ouput", rownames = FALSE,
            options = list(scrollX = TRUE, pageLength = 10, dom = 'ip'))
 
-callModule(extendedDT, "vpc_db_table",
+callModule(extendedDT, buttons = FALSE, "vpc_db_table",
            reactive_table = reactive(vpc_db_table()),
            filename = "vpc_summary", rownames = FALSE,
            options = list(scrollX = TRUE, pageLength = 10, dom = 'ip'))
