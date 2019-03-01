@@ -231,13 +231,7 @@
 
     g
   })
-#
-#   output$outliers_boxplot_table <- renderDataTable({
-#     out_data <- req(outliers_boxplot_detection())
-#
-#     datatable(out_data$outliers, rownames = FALSE,
-#               options = list(pageLength = 20, dom = 'rtip'))
-#   })
+
 
   output$outliers_boxplot_message <- renderText({
     out_data <- req(outliers_boxplot_detection())

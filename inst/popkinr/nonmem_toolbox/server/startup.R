@@ -1,11 +1,7 @@
-# # DEBUGGING
-# Sys.setenv(NM_EXE="/usr/local/bin/nmr",
-#            NM_CALL="{nonmem_exe} {control_file} -local",
-#            NMCHECK_EXE="/usr/local/bin/nmr",
-#            NMCHECK_CALL="{nmcheck_exe} {control_file} -test")
-# plan(sequential)
 options(shiny.fullstacktrace = TRUE)
 
+# # DEBUGGING
+# plan(sequential)
 plan(multiprocess)
 
 env_home <- Sys.getenv("HOME")

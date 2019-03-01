@@ -214,7 +214,6 @@ output$individual_pages <- renderUI({
   sliderInput("individual_pages", "Pages", value = 1, min = 1, max = n_pages, step = 1, width = "100%")
 })
 
-#observeEvent(input$individual_pages, {
 observe({
   req(input$individual_pages)
   req(input$individual_layout)
