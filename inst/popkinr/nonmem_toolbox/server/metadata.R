@@ -9,9 +9,9 @@ output$compartments_metadata <- renderRHandsontable({
     hot_col(c("cmt", "dv_target", "type"), readOnly = TRUE)
 })
 
-output$regressors_metadata <- renderRHandsontable({
+output$idv_metadata <- renderRHandsontable({
   run <- req(rv$run)
-  df <- req(run$model$regressors)
+  df <- req(run$model$independent_variables)
 
   rhandsontable(df, readOnly = TRUE) %>%
     hot_col(c("column"), readOnly = TRUE)
@@ -71,7 +71,7 @@ output$selected_categorical_covariate_metadata <- renderRHandsontable({
   values <- run$model$categorical_covariates_levels[[selected_cov]]
   labels <- names(values)
 
-  df <- data_frame(value = values,
+  df <- tibble(value = values,
                    label = labels) %>%
     arrange(as.character(value))
 
@@ -303,7 +303,7 @@ output$unknown_metadata <- renderUI({
   unknown <- setdiff(c_names,
                      c(run$model$covariates$column,
                        na.omit(run$model$parameters$column),
-                       run$model$regressors$column,
+                       run$model$independent_variables$column,
                        run$model$residuals,
                        run$model$predictions,
                        pmxploit::nm_reserved_names))
@@ -341,10 +341,10 @@ observeEvent(input$add_to_parameters, {
 })
 
 
-observeEvent(input$add_to_regressors, {
+observeEvent(input$add_to_idv, {
   u_sel <- req(input$unknown_metadata)
 
-  rv$run$model$regressors <- rv$run$model$regressors %>% add_row(column = u_sel,
+  rv$run$model$independent_variables <- rv$run$model$independent_variables %>% add_row(column = u_sel,
                                                                  name = u_sel,
                                                                  unit = NA_character_)
 })

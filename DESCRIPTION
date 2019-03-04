@@ -12,7 +12,6 @@ Imports:
     tibble
 Suggests:
     future,
-    future.batchtools,
     shinydashboard,
     pmxploit,
     pmxexecute,

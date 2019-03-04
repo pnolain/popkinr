@@ -3,6 +3,7 @@ output: html_document
 editor_options: 
   chunk_output_type: console
 ---
+
 # NONMEM toolbox
 
 ```{r}
@@ -10,8 +11,8 @@ nonmem_toolbox()
 ```
 
 ```{r}
-nonmem_toolbox(nonmem_exe = "/software/nonmem/nonmem741_openleap43/run/nmfe74",
-               nmcheck_exe = "/software/nonmem/nonmem741_openleap43/tr/NMTRAN.exe")
+nonmem_toolbox(nonmem_exe = "/opt/nm/run/nmfe74",
+               nmcheck_exe = "/opt/nm/tr/NMTRAN.exe")
 ```
 
 ```{r}
@@ -23,15 +24,29 @@ nonmem_toolbox(nonmem_exe = "/usr/local/bin/nmr",
 
 # NONMEM monitor
 
-```{r}
-nonmem_monitor(nonmem_exe = "/software/nonmem/nonmem741_openleap43/run/nmfe74",
-               nmcheck_exe = "/software/nonmem/nonmem741_openleap43/tr/NMTRAN.exe",
-               nonmem_parafile = "/software/nonmem/nonmem741_openleap43/runfiles/mpilinux8.pnm")
-```
+## Start runs with NONMEM executable
+
+Set `nonmem_exe` argument to your NONMEM executable path.
 
 ```{r}
-nonmem_monitor(nonmem_exe = "/usr/local/bin/nmr",
-               nonmem_call = "{nonmem_exe} -local {control_file}",
-               nmcheck_exe = "/usr/local/bin/nmr",
-               nmcheck_call = "{nmcheck_exe} -test {control_file}")
+nonmem_monitor(nonmem_exe = "/opt/nm/run/nmfe74",
+               nmcheck_exe = "/opt/nm/tr/NMTRAN.exe",
+               nonmem_parafile = "/opt/nm/runfiles/mpilinux8.pnm")
 ```
+
+## Start runs with PsN
+
+Set `nonmem_exe` argument to your PsN execute command.
+
+```{r}
+nonmem_monitor(nonmem_exe = "/usr/local/bin/execute",
+               nonmem_call = "{nonmem_exe} {control_file} -nodes={n_nodes}",
+               nmcheck_exe = "/opt/nm/tr/NMTRAN.exe")
+```
+
+# Dataset exploration
+
+```{r}
+dataset_exploration()
+```
+

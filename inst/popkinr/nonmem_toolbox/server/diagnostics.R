@@ -16,10 +16,10 @@ output$dv_vs_pred_type <- renderUI({
 })
 
 
-output$indiv_regressor <- renderUI({
+output$indiv_idv <- renderUI({
   run <- req(rv$run)
 
-  selectInput("indiv_regressor", "X-axis", choices = set_names(run$model$regressors$column, run$model$regressors$name))
+  selectInput("indiv_idv", "X-axis", choices = set_names(run$model$independent_variables$column, run$model$independent_variables$name))
 })
 
 output$indiv_cat_cov <- renderUI({
@@ -46,7 +46,7 @@ output$indiv_pred_type <- renderUI({
 output$res_x_type <- renderUI({
   run <- req(rv$run)
 
-  res_x_names <- req(c(run$model$regressors$column, run$model$predictions))
+  res_x_names <- req(c(run$model$independent_variables$column, run$model$predictions))
 
   def_selection <- intersect(res_x_names, c("TIME", "PRED"))
 
@@ -84,8 +84,15 @@ output$selected_dv_vs_pred_data <- renderDataTable({
   lhs <- (brush$mapping)[panel_names] %>% unlist
   rhs <- brush[panel_names] %>% unlist
 
+  # browser()
+  # data <- data %>%
+  #   filter_(.dots = sapply(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% unname)
+
+
+  exprs <- map(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% map(as_quosure) %>%  unname()
+
   data <- data %>%
-    filter_(.dots = sapply(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% unname)
+    filter(!!!exprs)
 
   brush$mapping[panel_names] <- NULL
 
@@ -95,7 +102,7 @@ output$selected_dv_vs_pred_data <- renderDataTable({
   if(nrow(df) > 0) {
     df <- df %>% mutate(n = row_number()) %>%  spread(X, X_Value) %>% spread(Y, Y_Value) %>% select(-n)
   } else {
-    df <- data_frame(ID = numeric(), TIME = numeric(), CMT = numeric())
+    df <- tibble(ID = numeric(), TIME = numeric(), CMT = numeric())
   }
 
   datatable(df, options = list(pageLength = 20, dom = 'rtip'))
@@ -116,7 +123,7 @@ output$selected_spaghetti_data <- renderDataTable({
       df <- df %>% select(-one_of(paste(input$diagnostic_split_by, collapse = ".")))
     }
   }else {
-    df <- data_frame(ID = numeric(), TIME = numeric(), CMT = numeric())
+    df <- tibble(ID = numeric(), TIME = numeric(), CMT = numeric())
   }
 
   datatable(df, options = list(pageLength = 20, dom = 'rtip'))
@@ -124,7 +131,7 @@ output$selected_spaghetti_data <- renderDataTable({
 })
 output$selected_residuals_data <- renderDataTable({
 
-  df <- data_frame(ID = numeric(), CMT = numeric())
+  df <- tibble(ID = numeric(), CMT = numeric())
 
   data<- req(run_residuals_plot()$data)
 
@@ -141,8 +148,13 @@ output$selected_residuals_data <- renderDataTable({
       lhs <- (brush$mapping)[panel_names] %>% unlist
       rhs <- brush[panel_names] %>% unlist
 
+      # data <- data %>%
+      #   filter_(.dots = sapply(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% unname)
+
+      exprs <- map(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% map(as_quosure) %>%  unname()
+
       data <- data %>%
-        filter_(.dots = sapply(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% unname)
+        filter(!!!exprs)
 
       brush$mapping[panel_names] <- NULL
 
@@ -151,7 +163,7 @@ output$selected_residuals_data <- renderDataTable({
 
       if(nrow(df)>0){
         df <- df %>% mutate(n = row_number()) %>%
-          spread(Regressor, Regressor_Value) %>%
+          spread(idv, idv_Value) %>%
           spread(Residuals, Residuals_Value) %>%
           select(-n)
       }
@@ -167,8 +179,14 @@ output$selected_residuals_data <- renderDataTable({
 
       data <- data %>%
         group_by(CMT, Residuals) %>%
-        arrange(Residuals_Value) %>%
-        filter_(.dots = sapply(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% unname)
+        arrange(Residuals_Value) #%>%
+        #filter_(.dots = sapply(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% unname)
+
+
+      exprs <- map(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% map(as_quosure) %>%  unname()
+
+      data <- data %>%
+        filter(!!!exprs)
 
       norm_quantiles <- data %>%
         summarise(fi = list((1:n() - 0.5) / n())) %>%
@@ -179,7 +197,7 @@ output$selected_residuals_data <- renderDataTable({
       norm_quantiles$res <- data$Residuals_Value
 
 
-      selected_subjects <- data_frame(ID = numeric())
+      selected_subjects <- tibble(ID = numeric())
 
       brush$mapping[panel_names] <- NULL
 
@@ -214,7 +232,6 @@ output$individual_pages <- renderUI({
   sliderInput("individual_pages", "Pages", value = 1, min = 1, max = n_pages, step = 1, width = "100%")
 })
 
-#observeEvent(input$individual_pages, {
 observe({
   req(input$individual_pages)
   req(input$individual_layout)
@@ -322,9 +339,9 @@ build_all_individual_profiles_plot <- function(filepath){
                                  predictions = req(input$indiv_pred_type),
                                  categorical_covariate = cat_cov,
                                  log_dv = input$diag_log_dv,
-                                 regressor = req(input$indiv_regressor),
+                                 idv = req(input$indiv_idv),
                                  show_observations = input$show_observations,
-                                 predictions_dots = input$predictions_dots,
+                                 predictions_dots = as.logical(input$predictions_dots),
                                  x_scale = input$plots_x_scale,
                                  y_scale = input$plots_y_scale,
                                  facet_scales = input$facet_scales,
@@ -472,7 +489,7 @@ run_spaghetti_plot <- reactive({
     group_by(UQS(grps)) %>%
     plot_observed_profiles(compartment = selected_cmt,
                            ids = ids,
-                           regressor = req(input$spaghetti_regressor),
+                           idv = req(input$spaghetti_idv),
                            log_dv = input$diag_log_dv,
                            facetted = input$spaghetti_split_facets,
                            facet_scales = input$facet_scales,
@@ -483,10 +500,10 @@ run_spaghetti_plot <- reactive({
                            transparency = input$transparency)
 })
 
-output$spaghetti_regressor <- renderUI({
+output$spaghetti_idv <- renderUI({
   run <- req(rv$run)
 
-  selectInput("spaghetti_regressor", "X-axis", set_names(run$model$regressors$column, run$model$regressors$name))
+  selectInput("spaghetti_idv", "X-axis", set_names(run$model$independent_variables$column, run$model$independent_variables$name))
 })
 
 run_residuals_plot <- reactive({
@@ -517,7 +534,7 @@ run_residuals_plot <- reactive({
 filtered_run() %>%
     group_by(UQS(grps)) %>%
     plot_residuals(compartment = selected_cmt,
-                   regressor = req(input$res_x_type), residuals = req(input$res_y_type),
+                   idv = req(input$res_x_type), residuals = req(input$res_y_type),
                    absolute_residuals = abs_res,
                    histogram_bins = input$residuals_hist_bins,
                    histogram_empirical_density = input$residuals_histogram_empirical_density,
@@ -573,7 +590,7 @@ run_individuals_plot <- reactive({
                              predictions = req(input$indiv_pred_type),
                              categorical_covariate = cat_cov,
                              log_dv = input$diag_log_dv,
-                             regressor = req(input$indiv_regressor),
+                             idv = req(input$indiv_idv),
                              show_observations = input$show_observations,
                              predictions_dots = input$predictions_dots,
                              x_scale = input$plots_x_scale,

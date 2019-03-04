@@ -10,7 +10,6 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(tidyr)
   library(dplyr)
-  library(magrittr)
   library(stringr)
   library(purrr)
   library(readr)
@@ -19,7 +18,6 @@ suppressPackageStartupMessages({
   library(broom)
   library(future)
   library(pmxploit)
-  library(pmxecute)
   library(rlang)
   library(xml2)
   library(vpc)
@@ -28,10 +26,8 @@ suppressPackageStartupMessages({
   library(jsonlite)
 })
 
-# source("modules/serverbrowser.R")
 source("modules/extendedPlot.R")
 source("modules/extendedDT.R")
-source("modules/extendedDTnew.R")
 
 # Show VPC tab only if a NONMEM executable path is available
 vpc_tab <- (if(Sys.getenv("NM_EXE") != "") {
@@ -124,12 +120,13 @@ dashboardPage(
         ),
         h6(
           sprintf(
-            "pmxploit version: %s (%s)",
-            packageDescription("pmxploit")$Version,
-            packageDescription("pmxploit")$Date
+            "PopkinR version: %s (%s)",
+            packageDescription("popkinr")$Version,
+            packageDescription("popkinr")$Date
           )
         ),
-        h6("Patrick Nolain, Sanofi M&S Montpellier"),
+        h6("Patrick Nolain"),
+        tags$a("patrick.nolain@sanofi.com", href="mailto:patrick.nolain@sanofi.com"),
         hr(),
         actionLink("example", "Demo")
       )
@@ -145,13 +142,10 @@ dashboardPage(
     div(
       id = "loading-content",
       img(
-        src = "media/pmxploit.svg",
-        width = 175,
-        height = 175
-      ),
-      br(),
-      br(),
-      img(src = "media/balls.svg")
+        src = "media/pmxploit_animated.svg",
+        width = 200,
+        height = 200
+      )
     ),
     tabItems(
       tabItem(tabName = "home",
@@ -240,8 +234,8 @@ dashboardPage(
           ),
           box(
             width = 6,
-            title = "Regressors",
-            rHandsontableOutput("regressors_metadata")
+            title = "Independent variables",
+            rHandsontableOutput("idv_metadata")
           ),
           box(
             width = 12,
@@ -294,7 +288,7 @@ dashboardPage(
                 actionButton("add_to_parameters", "Individual parameters"),
                 actionButton("add_to_categorical_cov", "Categorical covariates"),
                 actionButton("add_to_continuous_cov", "Continuous covariates"),
-                actionButton("add_to_regressors", "Regressors")
+                actionButton("add_to_idv", "Independent variables")
 
               )
             )
@@ -345,11 +339,11 @@ dashboardPage(
                     verbatimTextOutput("termination_information")
                   ),
                   tabPanel(title = "Fixed effects (THETAs)",
-                           extendedDTUInew("thetas_table")),
+                           extendedDTUI("thetas_table")),
                   tabPanel(
                     title = "Random effects (OMEGA)",
                     h4("Covariances (ETA:ETA)"),
-                    extendedDTUInew("omega_table"),
+                    extendedDTUI("omega_table"),
                     p("The coefficient of variation is given considering log-normal variability for parameters:",
                       withMathJax('$$CV(e^{\\eta})=\\sqrt{e^{\\omega^{2}}-1}$$')),
                     br(),
@@ -367,14 +361,14 @@ dashboardPage(
                     ),
                     br(),
                     h4("ETA bars"),
-                    extendedDTUInew("eta_bars_table")
+                    extendedDTUI("eta_bars_table")
                   ),
                   tabPanel(title = "Residual error terms (SIGMA)",
                            fluidRow(
                              column(
                                width = 8,
                                h4("Covariances (EPS:EPS)"),
-                               extendedDTUInew("sigma_table")
+                               extendedDTUI("sigma_table")
                              ),
                              column(
                                width = 4,
@@ -385,16 +379,16 @@ dashboardPage(
                   tabPanel(
                     title = "Shrinkage",
                     h4("Random effects"),
-                    extendedDTUInew("eta_shrinkage_table"),
+                    extendedDTUI("eta_shrinkage_table"),
                     br(),
                     h4("Residual error terms"),
-                    extendedDTUInew("eps_shrinkage_table"),
+                    extendedDTUI("eps_shrinkage_table"),
                     br(),
                     h4("Legend"),
                     div(tags$ul(
                       tags$li(
                         "ETA shrinkage: Inter-subject shrinkage for each ETA",
-                        withMathJax('$$\\eta_{shrink}=1-\\frac{SD(\\hat\\eta)}{\\omega}$$')
+                        withMathJax('$$\\eta_{shrink}=1-\\dfrac{SD(\\hat\\eta)}{\\omega}$$')
                       ),
                       tags$li(
                         "EBV shrinkage: Shrinkage based on the average empirical Bayes variance"
@@ -530,7 +524,7 @@ dashboardPage(
                     value = "spaghetti_tab",
                     title = "Spaghetti plot",
                     flowLayout(
-                      uiOutput("spaghetti_regressor"),
+                      uiOutput("spaghetti_idv"),
                       checkboxInput("spaghetti_split_facets", "Splits by facets", value = TRUE),
                       checkboxInput(
                         "spaghetti_split_means",
@@ -608,7 +602,7 @@ dashboardPage(
                     fluidRow(
                       column(
                         2,
-                        uiOutput("indiv_regressor"),
+                        uiOutput("indiv_idv"),
                         selectInput(
                           "individual_layout",
                           "Layout",
@@ -784,7 +778,7 @@ dashboardPage(
                     title = "Tables",
                     tabPanel(
                       "Summary statistics",
-                      extendedDTUInew("parameters_distributions_summary")
+                      extendedDTUI("parameters_distributions_summary")
                     ),
                     tabPanel(
                       "Individual values",
@@ -1047,8 +1041,6 @@ dashboardPage(
                     align = "center",
                     actionButton("categorical_covariates_refresh", "Refresh")
                   ),
-
-                  # uiOutput("categorical_covariates_distributions_split_by"),
                   flowLayout(
                     selectInput(
                       "categorical_covariates_show_frequency",
@@ -1120,7 +1112,6 @@ dashboardPage(
                     ),
                     column(
                       width = 8,
-                      #uiOutput("selected_parameters"),
                       selectizeInput(
                         "p_c_selected_parameters",
                         "Parameters selection",
@@ -1133,7 +1124,6 @@ dashboardPage(
                       ),
                       conditionalPanel(
                         condition = "input.covariates_type_tab == 'continuous_tab'",
-                        #uiOutput("selected_continuous_covariates")
                         selectizeInput(
                           "p_c_selected_continuous_covariates",
                           "Continuous covariates selection",
@@ -1147,7 +1137,6 @@ dashboardPage(
                       ),
                       conditionalPanel(
                         condition = "input.covariates_type_tab == 'categorical_tab'",
-                        #uiOutput("selected_categorical_covariates")
                         selectizeInput(
                           "p_c_selected_categorical_covariates",
                           "Categorical covariates selection",
@@ -1292,23 +1281,32 @@ dashboardPage(
           tabBox(
             width = 12,
             tabPanel(title = "Standard QC",
-                     DT::dataTableOutput("qc_standard"),
-                     div(
-                       tags$ul(
-                         tags$li("Maximal Error:",
-                                 withMathJax('$$ME=max(|obs_i-pred_i|)$$')),
-                         tags$li(
-                           "Average fold error:",
-                           withMathJax(
-                             '$$AFE=10^{\\frac{\\sum_{i=1}^N{|log(\\frac{obs}{pred}) |}}{N}}$$'
-                           )
-                         )
-                       )
-                     ),
-                     h4("Bias (Mean Prediction Error)"),
-                     DT::dataTableOutput("qc_bias"),
-                     h4("Precision (Root Mean Square Error)"),
-                     DT::dataTableOutput("qc_precision")),
+                     fluidRow(column(9,
+                                     DT::dataTableOutput("qc_standard"),
+                                     h4("Bias (Mean Prediction Error)"),
+                                     DT::dataTableOutput("qc_bias"),
+                                     h4("Precision (Root Mean Square Error)"),
+                                     DT::dataTableOutput("qc_precision")),
+                              column(3,
+                                     h4("Formulas"),
+                                     tags$ul(
+                                       tags$li("Maximal Error:",
+                                               withMathJax('$$ME=max(|pred_i-obs_i|)$$')),
+                                       tags$li(
+                                         "Absolute Average Fold Error:",
+                                         withMathJax(
+                                           '$$AAFE=10^{\\dfrac{1}{N}{\\sum_{i=1}^N{|log(\\dfrac{pred_i}{obs_i}) |}}}$$'
+                                         )
+                                       ),
+                                       tags$li("MPE (absolute)",
+                                               withMathJax('$$MPE=\\dfrac{1}{N}{\\sum_{i=1}^N{pred_i-obs_i}}$$')),
+                                       tags$li("MPE (relative)",
+                                               withMathJax('$$MPE(\\%)=\\dfrac{1}{N}{\\sum_{i=1}^N{\\dfrac{pred_i-obs_i}{obs_i}}}$$')),
+                                       tags$li("RMSE (absolute)",
+                                               withMathJax('$$RMSE=\\sqrt{\\dfrac{\\sum_{i=1}^N{(pred_i-obs_i)^2}}{N}}$$')),
+                                       tags$li("RMSE (relative)",
+                                               withMathJax('$$RMSE(\\%)=\\dfrac{RMSE}{\\overline{obs}}$$'))
+                                     )))),
             tabPanel(title = "Student's t-Tests",
                      em("Observations vs Predictions; paired, two-sided"),
                      DT::dataTableOutput("qc_t_test_obs"),
@@ -1319,7 +1317,9 @@ dashboardPage(
                      DT::dataTableOutput("qc_corr_test")),
             tabPanel(title = "Linear regression",
                      DT::dataTableOutput("qc_lin_reg"),
-                     uiOutput("run_qc_lin_reg_plot"))
+                     uiOutput("run_qc_lin_reg_plot")),
+            tabPanel(title = "R code",
+                     shinyAce::aceEditor("qc_r_code", mode = "r", height = "100px", readOnly = TRUE))
         )
       )
       ),
@@ -1457,7 +1457,7 @@ dashboardPage(
                     "Based on the run estimation results, a control stream is generated to perform simulations for Visual Predictive Checks."
                   ),
                   br(),
-                  tags$strong("Steps:"),
+                  tags$strong("The following must be performed to generate VPC:"),
                   tags$ol(
                     tags$li("Set the local paths to NONMEM and NMTRAN check executables"),
                     tags$li("Set number of simulations and seed"),
@@ -1466,7 +1466,10 @@ dashboardPage(
                       "Run simulations locally using NONMEM (do not close the application until computation is finished)"
                     )
                   ),
-
+                  br(),
+                  tags$div("The VPC plots and data are then computed by the ", tags$strong("vpc"),
+                           " R package (docs: ", tags$a(href = "http://vpc.ronkeizer.com/", target = "_blank", "http://vpc.ronkeizer.com/"), ")")
+                  ,
                   fluidRow(column(
                     8,
                     h4("NONMEM paths"),
@@ -1492,7 +1495,8 @@ dashboardPage(
                   tags$div(
                     align = "center",
                     actionButton("generate_control_stream", "Generate control stream")
-                  )
+                  ),
+                  uiOutput("vpc_location")
                 ),
                 tabBox(
                   width = 12,
@@ -1503,6 +1507,7 @@ dashboardPage(
                                     fluidRow(
                                       column(
                                         6,
+                                        uiOutput("vpc_idv"),
                                         uiOutput("vpc_cmt"),
                                         checkboxInput("vpc_correction", "Prediction-correction", value = FALSE),
                                         sliderInput(
@@ -1591,15 +1596,6 @@ dashboardPage(
                                     extendedDTUI("vpc_db_table", title = "VPC summary data"),
                                     extendedDTUI("vpc_obs_table", title = "Observations"),
                                     extendedDTUI("vpc_sim_table", title = "VPC Simulations"))
-                             # column(
-                             #   4,
-                             # ),
-                             # column(
-                             #   4,
-                             # ),
-                             # column(
-                             #   4,
-                             # )
                            ))
                 )
               )),
@@ -1659,7 +1655,6 @@ dashboardPage(
                         2,
                         downloadButton("export_comparison_table", "Export")
                       )),
-                      #DT::dataTableOutput("comparison_table")
                       extendedDTUI("comparison_table")
                     ),
                     tabPanel("Plots",
@@ -1715,16 +1710,6 @@ dashboardPage(
                       checkboxInput("comparison_stats_table_rse", "RSE", value = FALSE),
                       extendedDTUI("comparison_stats_table")
                     )
-                    # ,
-                    # tabPanel("Quality criteria",
-                    #          uiOutput("qc_comparison_pred_type"),
-                    #          actionButton("compute_qc_comparison", "Compare quality criteria"),
-                    #          h4("Standard QC"),
-                    #          DT::dataTableOutput("qc_comparison_standard"),
-                    #          h4("Bias (Mean Prediction Error)"),
-                    #          DT::dataTableOutput("qc_comparison_bias"),
-                    #          h4("Precision (Root Mean Square Error)"),
-                    #          DT::dataTableOutput("qc_comparison_precision"))
                   )
                 )
               )),

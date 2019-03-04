@@ -5,45 +5,47 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
+knitr::opts_chunk$set(collapse = TRUE,
+                      comment = "#>",
+                      fig.path   = 'man/figures/',
+                      fig.align  = 'center',
+                      out.width  = '80%', 
+                      dev        = 'png',
+                      dev.args   = list(type = 'cairo'))
 ```
+
+[![CRAN status](https://www.r-pkg.org/badges/version/popkinr)](https://cran.r-project.org/package=popkinr)
+
 # popkinr
 
-The goal of popkinr is to ...
+PopkinR is an R package aiming at facilitating the development of non-linear mixed effects models with NONMEM.
 
-## Installation
+It contains interactive web-applications based on `shiny` for:
 
-You can install the released version of popkinr from [CRAN](https://CRAN.R-project.org) with:
+* Post-processing of NONMEM runs results (`PMXploit`)
+* Launch of NONMEM runs and editing control files (`PMXecute`)
+* Exploration of NONMEM-like datasets (`PMXplore`)
 
-``` r
-install.packages("popkinr")
-```
+## PMXploit `popkinr::nonmem_toolbox`
 
-## Example
+Together with the [**pmxploit**](https://github.com/pnolain/pmxploit) package, brings interactivity to NONMEM runs post-processing analysis.
 
-This is a basic example which shows you how to solve a common problem:
+Dynamically generates corresponding R-code to most of the plots and tables provided by the application so it can be embedded in any R script.
 
-```{r example}
-## basic example code
-```
+![pmxploit](pkgdown/pmxploit.gif)
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
 
-```{r cars}
-summary(cars)
-```
+## PMXecute `popkinr::nonmem_monitor`
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
+*Gif preview...*
 
-You can also embed plots, for example:
+## PMXplore `popkinr::dataset_exploration`
 
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
+*Gif preview...*
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
+# Installation
+
+## Packages dependencies
+
+*R packages requirement list per app...*
+
