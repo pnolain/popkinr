@@ -5,12 +5,13 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
+knitr::opts_chunk$set(collapse = TRUE,
+                      comment = "#>",
+                      fig.path   = 'man/figures/',
+                      fig.align  = 'center',
+                      out.width  = '80%', 
+                      dev        = 'png',
+                      dev.args   = list(type = 'cairo'))
 ```
 
 [![CRAN status](https://www.r-pkg.org/badges/version/popkinr)](https://cran.r-project.org/package=popkinr)
@@ -27,22 +28,24 @@ It contains interactive web-applications based on `shiny` for:
 
 ## PMXploit `popkinr::nonmem_toolbox`
 
-....
+Together with the [**pmxploit**](https://github.com/pnolain/pmxploit) package, brings interactivity to NONMEM runs post-processing analysis.
+
+Dynamically generates corresponding R-code to most of the plots and tables provided by the application so it can be embedded in any R script.
+
+![pmxploit](pkgdown/pmxploit.gif)
+
 
 ## PMXecute `popkinr::nonmem_monitor`
 
-....
+*Gif preview...*
 
 ## PMXplore `popkinr::dataset_exploration`
 
-....
+*Gif preview...*
 
 # Installation
 
 ## Packages dependencies
 
-...
+*R packages requirement list per app...*
 
-## System requirements
-
-...
