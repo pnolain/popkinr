@@ -27,18 +27,18 @@ Dynamically generates corresponding R-code to most of the plots and tables provi
 PMXecute `popkinr::nonmem_monitor` <img id="logo" src="pkgdown/pmxecute.svg" alt="pmxecute" width="125px" align="right" />
 --------------------------------------------------------------------------------------------------------------------------
 
-*Description*
+Application for launching and monitoring NONMEM runs on a local setup.
 
-*...*
+Provides control file generation functionalities for models with $PRIOR, $CHAIN processing or bootstrapping.
 
 *Gif preview...*
 
 PMXplore `popkinr::dataset_exploration` <img id="logo" src="pkgdown/pmxplore.svg" alt="pmxplore" width="125px" align="right" />
 -------------------------------------------------------------------------------------------------------------------------------
 
-*Description*
+Application for exploratory data analysis of NONMEM-like datasets.
 
-*...*
+Provides interactive visualizations and summaries of dependent variables, dosing regimens and covariates (distributions, longitudinal evolution) and dataset manipulation functionalities.
 
 *Gif preview...*
 
