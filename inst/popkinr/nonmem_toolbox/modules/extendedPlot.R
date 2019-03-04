@@ -36,9 +36,10 @@ extendedPlotUI <- function(id, title = "plot", exportable = TRUE, zoomable = TRU
                        downloadButton(ns("download_plot"), label = "Export plot"),
                        actionButton(ns("save_plot"), "Save in run files"),
                        downloadButton(ns("download_ggplot"), label = "Export ggplot2 object (*.rds)")))),
+
       div(id = ns("r_code_section"),
           h4("R code"),
-          shinyAce::aceEditor(ns("r_code"), mode = "r", height = "100px", readOnly = TRUE)))
+          shinyAce::aceEditor(ns("r_code"), mode = "r", height = "80px", readOnly = TRUE)))
   }
 
   div(

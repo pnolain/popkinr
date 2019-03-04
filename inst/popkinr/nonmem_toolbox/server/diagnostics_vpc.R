@@ -183,7 +183,7 @@ observeEvent(input$vpc_run, {
     files_to_copy <- c(run$control_stream$dataset_file, extra_files)
 
     if(length(files_to_copy) > 0){
-      if(run$info$path == "/pmxploit/example/TMDD_Djebli_al"){ # run demo
+      if(run$info$path == pmxploit::EXAMPLERUN$info$path){ # run demo
         write_csv(run$tables$dataset, path = str_c(app_temp_vpc_directory, "/", run$control_stream$dataset_file), na = ".")
       } else if(file.info(run$info$path)$isdir){
         file.copy(str_c(run$info$path, files_to_copy, sep = "/"),
@@ -379,7 +379,6 @@ run_vpcdb <- reactive({
     }
   }
 
-  browser()
   idv <- input$vpc_idv
 
   is_time <- is.hms(obs_df[idv])

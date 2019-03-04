@@ -13,15 +13,19 @@ knitr::opts_chunk$set(
 )
 ```
 
+[![CRAN status](https://www.r-pkg.org/badges/version/popkinr)](https://cran.r-project.org/package=popkinr)
+
 # popkinr
 
-PopkinR contains `shiny` applications for:
+PopkinR is an R package aiming at facilitating the development of non-linear mixed effects models with NONMEM.
 
-* Exploration of NONMEM-like datasets (`PMXplore`)
-* Launch of NONMEM runs and editing control files (`PMXecute`)
+It contains interactive web-applications based on `shiny` for:
+
 * Post-processing of NONMEM runs results (`PMXploit`)
+* Launch of NONMEM runs and editing control files (`PMXecute`)
+* Exploration of NONMEM-like datasets (`PMXplore`)
 
-## PMXplore `popkinr::dataset_exploration`
+## PMXploit `popkinr::nonmem_toolbox`
 
 ....
 
@@ -29,7 +33,7 @@ PopkinR contains `shiny` applications for:
 
 ....
 
-## PMXploit `popkinr::nonmem_toolbox`
+## PMXplore `popkinr::dataset_exploration`
 
 ....
 

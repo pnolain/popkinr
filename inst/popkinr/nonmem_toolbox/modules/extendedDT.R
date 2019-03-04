@@ -10,7 +10,7 @@ extendedDTUI <- function(id, title = NULL){
     DT::dataTableOutput(ns("table")),
     div(id = ns("r_code_section"),
       h4("R code"),
-      shinyAce::aceEditor(ns("r_code"), mode = "r", height = "100px", readOnly = TRUE)))
+      shinyAce::aceEditor(ns("r_code"), mode = "r", height = "80px", readOnly = TRUE)))
 }
 
 # reactive_table: either a data frame or a DT::datatable object (for custom formatting)
@@ -174,9 +174,10 @@ extendedDT <- function(input, output, session, reactive_table, filename = "table
   inner_table <- reactive({
 
     val <- req(reactive_table())
-    #attr(reactive_table, "observable")$getValue()
 
-    dt <- val$formatting(val$data)
+    if(!is.data.frame(val)){
+      dt <- val$formatting(val$data)
+    }
 
     if(r_code)
       build_pmxploit_table_call()
