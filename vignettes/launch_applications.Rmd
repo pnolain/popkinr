@@ -3,6 +3,7 @@ output: html_document
 editor_options: 
   chunk_output_type: console
 ---
+
 # NONMEM toolbox
 
 ```{r}
@@ -42,3 +43,10 @@ nonmem_monitor(nonmem_exe = "/usr/local/bin/execute",
                nonmem_call = "{nonmem_exe} {control_file} -nodes={n_nodes}",
                nmcheck_exe = "/opt/nm/tr/NMTRAN.exe")
 ```
+
+# Dataset exploration
+
+```{r}
+dataset_exploration()
+```
+
