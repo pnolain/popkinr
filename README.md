@@ -13,24 +13,34 @@ It contains interactive web-applications based on `shiny` for:
 -   Launch of NONMEM runs and editing control files (`PMXecute`)
 -   Exploration of NONMEM-like datasets (`PMXplore`)
 
-PMXploit `popkinr::nonmem_toolbox`
-----------------------------------
+*Reference: [PopkinR: a suite of Shiny applications focused on the pharmacometrics workflow](https://www.page-meeting.org/pdf_assets/7336-PAGE%20Poster%20PopkinR%20-%20Final%20version.pdf) presented at PAGE 2018*
+
+PMXploit `popkinr::nonmem_toolbox` <img id="logo" src="pkgdown/pmxploit.svg" alt="pmxploit" width="125px" align="right" />
+--------------------------------------------------------------------------------------------------------------------------
 
 Together with the [**pmxploit**](https://github.com/pnolain/pmxploit) package, brings interactivity to NONMEM runs post-processing analysis.
 
 Dynamically generates corresponding R-code to most of the plots and tables provided by the application so it can be embedded in any R script.
 
-<img id="pmxploit" src="pkgdown/pmxploit.gif" alt="pmxploit />
+![pmxploit](pkgdown/pmxploit.gif)
 
-PMXecute `popkinr::nonmem_monitor`
-----------------------------------
+PMXecute `popkinr::nonmem_monitor` <img id="logo" src="pkgdown/pmxecute.svg" alt="pmxecute" width="125px" align="right" />
+--------------------------------------------------------------------------------------------------------------------------
 
-....
+Application for launching and monitoring NONMEM runs on a local setup.
 
-PMXplore `popkinr::dataset_exploration`
----------------------------------------
+Provides control file generation functionalities for models with $PRIOR, $CHAIN processing or bootstrapping.
 
-....
+*Gif preview...*
+
+PMXplore `popkinr::dataset_exploration` <img id="logo" src="pkgdown/pmxplore.svg" alt="pmxplore" width="125px" align="right" />
+-------------------------------------------------------------------------------------------------------------------------------
+
+Application for exploratory data analysis of NONMEM-like datasets.
+
+Provides interactive visualizations and summaries of dependent variables, dosing regimens and covariates (distributions, longitudinal evolution) and dataset manipulation functionalities.
+
+*Gif preview...*
 
 Installation
 ============
@@ -38,9 +48,4 @@ Installation
 Packages dependencies
 ---------------------
 
-...
-
-System requirements
--------------------
-
-...
+*R packages requirement list per app...*
