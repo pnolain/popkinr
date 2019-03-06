@@ -28,6 +28,7 @@ suppressPackageStartupMessages({
 
 source("modules/extendedPlot.R")
 source("modules/extendedDT.R")
+source("modules/extendedDT_with_code.R")
 
 # Show VPC tab only if a NONMEM executable path is available
 vpc_tab <- (if(Sys.getenv("NM_EXE") != "") {
@@ -339,11 +340,11 @@ dashboardPage(
                     verbatimTextOutput("termination_information")
                   ),
                   tabPanel(title = "Fixed effects (THETAs)",
-                           extendedDTUI("thetas_table")),
+                           extendedDT_with_code_UI("thetas_table")),
                   tabPanel(
                     title = "Random effects (OMEGA)",
                     h4("Covariances (ETA:ETA)"),
-                    extendedDTUI("omega_table"),
+                    extendedDT_with_code_UI("omega_table"),
                     p("The coefficient of variation is given considering log-normal variability for parameters:",
                       withMathJax('$$CV(e^{\\eta})=\\sqrt{e^{\\omega^{2}}-1}$$')),
                     br(),
@@ -361,14 +362,14 @@ dashboardPage(
                     ),
                     br(),
                     h4("ETA bars"),
-                    extendedDTUI("eta_bars_table")
+                    extendedDT_with_code_UI("eta_bars_table")
                   ),
                   tabPanel(title = "Residual error terms (SIGMA)",
                            fluidRow(
                              column(
                                width = 8,
                                h4("Covariances (EPS:EPS)"),
-                               extendedDTUI("sigma_table")
+                               extendedDT_with_code_UI("sigma_table")
                              ),
                              column(
                                width = 4,
@@ -379,10 +380,10 @@ dashboardPage(
                   tabPanel(
                     title = "Shrinkage",
                     h4("Random effects"),
-                    extendedDTUI("eta_shrinkage_table"),
+                    extendedDT_with_code_UI("eta_shrinkage_table"),
                     br(),
                     h4("Residual error terms"),
-                    extendedDTUI("eps_shrinkage_table"),
+                    extendedDT_with_code_UI("eps_shrinkage_table"),
                     br(),
                     h4("Legend"),
                     div(tags$ul(
@@ -778,7 +779,7 @@ dashboardPage(
                     title = "Tables",
                     tabPanel(
                       "Summary statistics",
-                      extendedDTUI("parameters_distributions_summary")
+                      extendedDT_with_code_UI("parameters_distributions_summary")
                     ),
                     tabPanel(
                       "Individual values",
