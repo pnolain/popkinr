@@ -412,7 +412,8 @@ shinyUI(
                   height = "1000px",
 
                   tabPanel("NCA results" , DT::dataTableOutput("NCAdata")),
-                  tabPanel ("Data",DT::dataTableOutput("NCA_inputdata"))
+                  tabPanel ("Data",DT::dataTableOutput("NCA_inputdata")),
+                  tabPanel ("Desc. Stats",DT::dataTableOutput("NCA_stat_data"))
                   # tabPanel("Plots")
                 ))
                 #tableOutput("filtered_data_view")

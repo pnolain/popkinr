@@ -843,7 +843,8 @@ shinyServer(function(input, output){
                          NCA_Intervals_Table=data.frame(start = 0, end = Inf),
                          NCA_output=NULL,
                          nca_joindata=NULL,
-                         dataset_path = NULL
+                         dataset_path = NULL,
+                         nca_stat_table = NULL
   )
 
 
@@ -1242,6 +1243,39 @@ shinyServer(function(input, output){
 
 
 
+  ###Stats desc sur les paramètres NCA:
+  observeEvent(input$Run_NCA,{
+
+
+    withProgress({
+      values$NCA_stat_table <- values$NCA_output  %>% select(-start, -end, -ID) %>% dplyr::summarise_all(funs(n=length, Mean=mean(.,na.rm=T), Median=median(.,na.rm=T),
+                                                                                                              Min=min(.,na.rm=T),Max=max(.,na.rm=T),SD=sd(.,na.rm=T))) %>%
+                               gather(stat,val) %>% separate(stat, into=c("var", "stat"), sep="_") %>% spread(var,val) %>% mutate_if(is.numeric,round,digits=3)
+      target = c("n","Mean","Median","Min","Max","SD")
+      values$NCA_stat_table <-values$NCA_stat_table[match(target,values$NCA_stat_table$stat),]
+
+
+      setProgress(value = 1, message = "Done !")
+    }, value = 0.5, message = "Calculating descriptive statistics...")
+
+  })
+
+  # sortie table stat NCA:
+  output$NCA_stat_data <- DT::renderDataTable({
+
+
+    values$NCA_stat_table
+
+  },
+  options = list(pageLength = 20,lengthMenu=c(20,40,100), dom = 'lftip', paging=TRUE, scrollX = TRUE,  filter='top',
+                 initComplete = JS(
+                   "function(settings, json) {",
+                   "$(this.api().table().header()).css({'background-color': '#4682B4', 'color': '#fff'});",
+                   "}")
+  ))
+
+
+
   ###Table sortie des doses et concs :
   observeEvent(input$Run_NCA,{
 
@@ -1295,7 +1329,7 @@ shinyServer(function(input, output){
   output$NCAdata <- DT::renderDataTable({
 
 
-    values$NCA_output
+    req(values$NCA_output) %>% mutate_if(is.numeric,round,digits=3)
 
   },
   options = list(pageLength = 20,lengthMenu=c(20,40,100), dom = 'lftip', paging=TRUE, scrollX = TRUE,  filter='top',
