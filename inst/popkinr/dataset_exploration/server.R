@@ -10,21 +10,29 @@ shinyServer(function(input, output){
   #This function is repsonsible for loading in the selected file
   filedata <- reactive({
 
-    if(!is.null(values$dataset_path)){
-      read.csv(values$dataset_path, na.strings = ".")
-    } else{
-      infile <- input$datafile
-      if (is.null(infile) & input$Demo==0) {
-        # User has not uploaded a file yet
-        return(NULL)
-      }
-      else if (!is.null(infile)){
-        read.csv(infile$datapath, na.strings = ".")
+    if(!is.null(values$dataset_path)& input$Demo==0){
+        if( str_detect(values$dataset_path, "\\.tar\\.gz$")){
+        run <- pmxploit::load_nm_run(values$dataset_path, temp_directory = str_c(tempdir(), "pmxploit"),
+                              load_tables = TRUE, read_initial_values = TRUE,
+                              keep_tempfiles = FALSE, extract_everything = FALSE,
+                              dataset_separator = NA, dataset_na_string = ".",
+                              update_progress = NULL, verbose = FALSE)
+        run$tables$dataset}
+        else{
+        read.csv(values$dataset_path, na.strings = ".")}
 
-      } else {
-        infile <- input$datafile
-        read.csv("www/DataSet_type.csv", na.strings = ".")
-      }
+                                                    }
+    else if (is.null(values$dataset_path) & input$Demo==0) {
+        # User has not uploaded a file yet# infile <- input$datafile
+        return(NULL)
+                                                        }
+      # else if (!is.null(infile)){
+      #   read.csv(infile$datapath, na.strings = ".")
+      #
+       else {
+
+         read.csv("www/DataSet_type.csv", na.strings = ".")
+      # }
     }
   })
 
@@ -104,17 +112,18 @@ shinyServer(function(input, output){
   #Je mets les infos globales dans les valueBOX
   output$check_box <- renderInfoBox({
 
-    infileraw <- input$datafile
-    if (is.null(infileraw) & input$Demo==0) {
+     infileraw <- values$dataset_path #if (is.null(values$dataset_path)){NULL} else if( str_detect(values$dataset_path, "\\.tar\\.gz$")){NULL} else {values$dataset_path}
+
+    if (is.null(infileraw) && input$Demo==0) {
       textfile="Welcome in PMxplore !!! Select your dataset !"
       colorcheck="purple"
       iconcheck="hand-o-up"
       labelcheck=""
 
     }
-    else if (!is.null(infileraw)){
-      L=readLines(infileraw$datapath)
-      L1=readLines(infileraw$datapath,n=1)
+    else if (!is.null(infileraw) && str_detect(infileraw, "\\.tar\\.gz$")==F){
+      L=readLines(infileraw)
+      L1=readLines(infileraw,n=1)
 
       numfields <-count.fields(textConnection(L),sep=",")
       numfields1 <-count.fields(textConnection(L1),sep=",")
@@ -130,12 +139,19 @@ shinyServer(function(input, output){
       labelcheck="Check number of rows and columns"}
     }
 
-    else if(input$Demo!=0){
-      textfile= "OK"
-      colorcheck="green"
-      iconcheck='check-square'
-      labelcheck="Check number of rows and columns"
-    }
+
+     else if(!is.null(infileraw) && str_detect(infileraw, "\\.tar\\.gz$")){
+       textfile= "OK nm"
+       colorcheck="green"
+       iconcheck='check-square'
+       labelcheck="Check number of rows and columns"
+     }
+     else if(is.null(infileraw) && input$Demo!=0){
+        textfile= "OK"
+        colorcheck="green"
+        iconcheck='check-square'
+        labelcheck="Check number of rows and columns"
+      }
 
 
     infoBox(title=labelcheck, textfile, color = colorcheck, icon = icon(iconcheck))
@@ -320,7 +336,7 @@ shinyServer(function(input, output){
   ### Téléchargement de la table de stats en sortie:
   output$download_stats <-  downloadHandler(
     filename = function() {
-      paste("Stat-on-",input$datafile,".xlsx", sep="")
+      paste("Stat-on-dataset",".xlsx", sep="")
     },
     content = function(file) {
       sht<-paste0("by",input$bylist)
@@ -677,7 +693,7 @@ shinyServer(function(input, output){
   ### Téléchargement de la table de stats en sortie:
   output$download_stats_cat <-  downloadHandler(
     filename = function() {
-      paste("Stat-on-CATvars",input$datafile,".xlsx", sep="")
+      paste("Stat-on-CATvars",".xlsx", sep="")
     },
     content = function(file) {
 
@@ -922,7 +938,7 @@ shinyServer(function(input, output){
   ### Téléchargement de la table en sortie:
   output$download1 <-  downloadHandler(
     filename = function() {
-      paste("Enriched",input$datafile, sep="")
+      paste("Enriched","dataset", sep="")
     },
     content = function(file) {
 
@@ -1196,7 +1212,7 @@ shinyServer(function(input, output){
     else {myrawconcdata <- myrawconcdata[-doublons,] %>% arrange(ID,NCATIME)}
 
     # myrawconcdata <- df %>% filter(is.na(AMT)) %>% dplyr::arrange(ID,TIME)  %>% slice(-1L)
-    myrawdosedata <- NCA_df %>% filter(!is.na(AMT),CMT==input$NCA_cmt_dose_choice)  %>% dplyr::mutate_(NCATIME=input$NCA_TimeVar, NCA.var= input$NCA_DVchoice) %>% dplyr::arrange_("ID", "NCATIME") %>% dplyr::group_by(ID ) %>% slice(1)
+    myrawdosedata <- NCA_df %>% filter(!is.na(AMT),CMT==input$NCA_cmt_dose_choice)  %>% dplyr::mutate_(NCATIME=input$NCA_TimeVar, NCA.var= input$NCA_DVchoice, AMT="AMT*input$Conv.factor") %>% dplyr::arrange_("ID", "NCATIME") %>% dplyr::group_by(ID ) %>% slice(1)
     # myrawdosedata <- df %>% filter(!is.na(AMT))  slice(1)
     #  # Put your concentration data into a PKNCAconc object
     myconc <- PKNCAconc(data=myrawconcdata,formula=NCA.var~NCATIME|ID)
@@ -1207,7 +1223,7 @@ shinyServer(function(input, output){
     #intervals
     # my.intervals <- data.frame(start=c(0,1000), end=c(Inf,2000), auclast=TRUE, cmax=TRUE, tmax=TRUE)
 
-    my.intervals <- isolate({values$NCA_Intervals_Table}) %>% mutate(cmax=T, tmax=T, aucall=T, auclast=T, tlast=T, cmin=T, lamba.z=T, half.life=T, aucinf.obs=T, aucinf.pred=T,tlag=T, clast.obs=T, vss.obs=T, vss.pred=T)
+    my.intervals <- isolate({values$NCA_Intervals_Table}) %>% mutate(cmax=T, tmax=T, aucall=T, auclast=T, tlast=T, cmin=T, lamba.z=T, half.life=T, aucinf.obs=T, aucinf.pred=T, tlag=T, clast.obs=T, vss.obs=T, vss.pred=T)
 
     mydata <- PKNCAdata(myconc, mydose , intervals=my.intervals)
     #  # # Compute the NCA parameters
@@ -1252,7 +1268,7 @@ shinyServer(function(input, output){
     if (purrr::is_empty(doublons)==T){myrawconcdata <- myrawconcdata %>% arrange(ID,NCATIME) %>% mutate(TYPE="Concentration")}
     else {myrawconcdata <- myrawconcdata[-doublons,] %>% arrange(ID,NCATIME)%>% mutate(TYPE="Concentration")}
 
-    myrawdosedata <- NCA_df %>% filter(!is.na(AMT),CMT==input$NCA_cmt_dose_choice)  %>% dplyr::mutate_(NCATIME=input$NCA_TimeVar, NCA.var= input$NCA_DVchoice) %>% dplyr::arrange_("ID", "NCATIME") %>% dplyr::group_by(ID )%>% mutate(TYPE="Dose") %>% select(ID,NCATIME,NCA.var,AMT,TYPE )
+    myrawdosedata <- NCA_df %>% filter(!is.na(AMT),CMT==input$NCA_cmt_dose_choice)  %>% dplyr::mutate_(NCATIME=input$NCA_TimeVar, NCA.var= input$NCA_DVchoice,AMT="AMT*input$Conv.factor") %>% dplyr::arrange_("ID", "NCATIME") %>% dplyr::group_by(ID )%>% mutate(TYPE="Dose") %>% select(ID,NCATIME,NCA.var,AMT,TYPE )
 
     values$nca_joindata <- dplyr::full_join(myrawconcdata,myrawdosedata,by =c("ID","NCATIME","TYPE","NCA.var","AMT")) %>% arrange(ID,NCATIME,desc(TYPE))
     values$nca_joindata
@@ -1368,7 +1384,7 @@ shinyServer(function(input, output){
   ### Téléchargement de la table NCA en sortie:
   output$NCA_download <-  downloadHandler(
     filename = function() {
-      paste("NCA_parameters_for",input$datafile, sep="")
+      paste("NCA_parameters_for", sep="")
     },
     content = function(file) {
 
@@ -1430,7 +1446,7 @@ shinyServer(function(input, output){
   dataset_browser <- callModule(popkinr::serverBrowser, "dataset_browser",
                                 root_directory = browsing_root,
                                 initial_selection = user_initial_selection,
-                                file_extensions = c("dat", "csv", "xslx"),
+                                file_extensions = c("dat", "csv", "xslx","tar.gz"),
                                 folder_shortcuts = reactive({
                                   if(nrow(startup_last_runs) > 0) return(dirname(startup_last_runs$path))
                                 })

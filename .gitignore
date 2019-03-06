@@ -31,3 +31,4 @@ vignettes/*.pdf
 # custom
 # all *.tar.gz
 *.tar.gz
+misc/
