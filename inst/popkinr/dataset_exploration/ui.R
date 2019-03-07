@@ -13,6 +13,7 @@ library(stringr)
 library(purrr)
 library(xml2)
 library(ggplot2)
+library(readr)
 
 library(plotly)
 library(rhandsontable)

@@ -940,11 +940,11 @@ shinyServer(function(input, output){
   ### Téléchargement de la table en sortie:
   output$download1 <-  downloadHandler(
     filename = function() {
-      paste("Enriched","dataset", sep="")
+      paste("Enriched","dataset.csv", sep="")
     },
     content = function(file) {
 
-      write_csv(req(values$rich_df), file, na=".",
+      readr::write_csv(req(values$rich_df), file, na=".",
                 col_names=TRUE,append=FALSE)
     }
 
@@ -1419,15 +1419,27 @@ shinyServer(function(input, output){
   ### Téléchargement de la table NCA en sortie:
   output$NCA_download <-  downloadHandler(
     filename = function() {
-      paste("NCA_parameters_for", sep="")
+      paste("NCA_parameters",".xlsx", sep="")
     },
     content = function(file) {
-
-      write_csv(req(values$NCA_output), file,
-                col_names=TRUE,append=FALSE)
-    }
+        xlsx::write.xlsx(values$NCA_output, file, sheetName="NCA parameters",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
+        xlsx::write.xlsx(values$NCA_stat_table, file, sheetName="Desc. Stat",row.names=FALSE, col.names=TRUE,append=TRUE, showNA=TRUE)
+      },contentType ="application/vnd.ms-excel"
 
   )
+
+  #
+  #   downloadHandler(
+  #   filename = function() {
+  #     paste("NCA_parameters.csv", sep="")
+  #   },
+  #   content = function(file) {
+  #
+  #     readr::write_csv(req(values$NCA_output), file,
+  #               col_names=TRUE,append=FALSE)
+  #   }
+  #
+  # )
 
 
 
