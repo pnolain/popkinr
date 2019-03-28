@@ -2,25 +2,51 @@ Package: popkinr
 Type: Package
 Title: Shiny applications for pharmacometrics
 Version: 1.1
-Authors@R: c(person("Patrick", "Nolain", email = "patrick.nolain@sanofi.com", role = c("aut", "cre")))
-Description: Shiny application for exploratory dataset analysis, NONMEM run management and post-processing
+Authors@R: c(person("Patrick", "Nolain", email = "patrick.nolain@sanofi.com", role = c("aut", "cre")),
+person("Combet", "Romain", email = "romain.combet@sanofi.com", role = c("aut")))
+Description: Shiny applications for exploratory dataset analysis, NONMEM run management and post-processing
 License: GPL-3
 Encoding: UTF-8
 Imports:
-    shiny,
-    stringr,
-    tibble
-Suggests:
-    future,
-    shinydashboard,
-    pmxploit,
-    pmxexecute,
-    vpc,
-    purrr,
-    dplyr,
-    tidyr,
-    readr,
-    jsonlite,
-    magrittr
+  broom,
+  Cairo,
+  diffr,
+  dplyr,
+  DT,
+  flexdashboard,
+  future,
+  ggplot2,
+  ggrepel,
+  hms,
+  jsonlite,
+  lubridate,
+  PKNCA,
+  plotly,
+  plyr,
+  pmxploit,
+  promises,
+  purrr,
+  R6,
+  readr,
+  rhandsontable,
+  rlang,
+  rmarkdown,
+  scales,
+  shiny,
+  shinyAce,
+  shinycssloaders,
+  shinydashboard,
+  shinyjs,
+  shinytoastr,
+  shinyTree,
+  shinyWidgets,
+  stringi,
+  stringr,
+  tibble,
+  tidyr,
+  vpc,
+  xlsx,
+  xml2,
+  zoo
 LazyData: true
 RoxygenNote: 6.1.1
