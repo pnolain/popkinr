@@ -10,7 +10,7 @@ extendedDT_with_code_UI <- function(id, title = NULL){
     DT::dataTableOutput(ns("table")),
     div(id = ns("r_code_section"),
         h4("R code"),
-        shinyAce::aceEditor(ns("r_code"), mode = "r", height = "100px", readOnly = TRUE)))
+        shinyAce::aceEditor(ns("r_code"), mode = "r", height = "100px", readOnly = TRUE, wordWrap = TRUE)))
 }
 
 # reactive_table: either a data frame or a DT::datatable object (for custom formatting)
