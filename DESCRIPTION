@@ -2,7 +2,8 @@ Package: popkinr
 Type: Package
 Title: Shiny applications for pharmacometrics
 Version: 1.1
-Authors@R: c(person("Patrick", "Nolain", email = "patrick.nolain@sanofi.com", role = c("aut", "cre")), person("Combet", "Romain", email = "romain.combet@sanofi.com", role = c("aut")))
+Authors@R: c(person("Patrick", "Nolain", email = "patrick.nolain@sanofi.com", role = c("aut", "cre")),person("Combet", "Romain", email = "romain.combet@sanofi.com", role = c("aut")))
+>>>>>>> 1d21d1c32434d3c02dae4bdf4d242e145b2e8f19
 Description: Shiny applications for exploratory dataset analysis, NONMEM run management and post-processing
 License: GPL-3
 Encoding: UTF-8
