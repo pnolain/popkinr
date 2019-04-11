@@ -85,7 +85,7 @@ run_browser_formatting <- function(id, text){
   is_nm_run <- is_nm_run_folder(id)
   if(is_nm_run) return(sprintf("<span style='color:red;'>%s</span>", text))
 
-  has_archives <- (length(list.files(id, pattern = "\\.tar\\.gz$", ignore.case = TRUE)) > 0)
+  has_archives <- (length(list.files(id, pattern = "(\\.tar\\.gz|\\.zip)$", ignore.case = TRUE)) > 0)
   if(has_archives) return(sprintf("<strong>%s</strong>", text))
 
   text
@@ -141,14 +141,14 @@ misc_run_browser <- callModule(popkinr::serverBrowser,
                        "misc_run_browser",
                        root_directory = browsing_root,
                        initial_selection = initial_misc_run_selection_folder,
-                       file_extensions = "tar.gz",
+                       file_extensions = c("tar.gz", "zip"),
                        formatting_function = run_browser_formatting)
 
 evaluation_run_browser <- callModule(popkinr::serverBrowser,
                              "evaluation_run_browser",
                              root_directory = browsing_root,
                              initial_selection = initial_evaluation_run_selection_folder,
-                             file_extensions = "tar.gz",
+                             file_extensions = c("tar.gz", "zip"),
                              formatting_function = run_browser_formatting)
 
 

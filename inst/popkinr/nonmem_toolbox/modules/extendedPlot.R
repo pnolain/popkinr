@@ -39,7 +39,7 @@ extendedPlotUI <- function(id, title = "plot", exportable = TRUE, zoomable = TRU
 
       div(id = ns("r_code_section"),
           h4("R code"),
-          shinyAce::aceEditor(ns("r_code"), mode = "r", height = "80px", readOnly = TRUE)))
+          shinyAce::aceEditor(ns("r_code"), mode = "r", height = "80px", readOnly = TRUE, wordWrap = TRUE)))
   }
 
   div(

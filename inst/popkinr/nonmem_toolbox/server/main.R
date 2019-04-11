@@ -129,7 +129,7 @@ observe({
   selection_is_nm_run <- FALSE
 
   if(length(run_browser()$file) == 1){
-    selection_is_nm_run <- str_detect(run_browser()$file, "\\.tar\\.gz$")
+    selection_is_nm_run <- str_detect(run_browser()$file, "(\\.tar\\.gz|\\.zip)$")
   } else {
     dir_path <- run_browser()$folder
 
