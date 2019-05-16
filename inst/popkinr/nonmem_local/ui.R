@@ -64,8 +64,7 @@ dashboardPage(
           packageDescription("popkinr")$Version,
           packageDescription("popkinr")$Date
         )
-      ),
-      h6("Patrick Nolain, M&S Montpellier")
+      )
     )
   ),
   dashboardBody(

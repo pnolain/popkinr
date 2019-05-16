@@ -29,7 +29,7 @@ shinyUI(
     skin = "purple",
     title = "PMxplore Dataset Exploration",
 
-    dashboardHeader(title = "PMxplore Montpellier", titleWidth = 400),
+    dashboardHeader(title = "PMxplore", titleWidth = 400),
 
     dashboardSidebar(
       sidebarMenu(
@@ -54,8 +54,8 @@ shinyUI(
             tags$img(src = "pmxplore.svg",  width = 175, height = 175)
         ),
         h6("PMxplore version: 1.1"),
-        h6("Romain Combet, Programming M&S Montpellier"),
-        h6("Patrick Nolain, M&S Montpellier")
+        h6("Romain Combet"),
+        h6("Patrick Nolain")
       )
     ),
     dashboardBody(

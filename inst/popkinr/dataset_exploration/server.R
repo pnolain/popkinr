@@ -336,13 +336,20 @@ shinyServer(function(input, output){
   ### Téléchargement de la table de stats en sortie:
   output$download_stats <-  downloadHandler(
     filename = function() {
-      paste("Stat-on-dataset",".xlsx", sep="")
+      paste("Stat-on-dataset",".csv", sep="")
     },
     content = function(file) {
       sht<-paste0("by",input$bylist)
-      xlsx::write.xlsx(tabstats$stats, file, sheetName="global",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
-      if (!is.null(tabstats$stats2)){xlsx::write.xlsx(as.data.frame(tabstats$stats2), file, sheetName=sht,row.names=FALSE, col.names=TRUE,append=TRUE, showNA=TRUE)
-      }},contentType ="application/vnd.ms-excel"
+      readr::write_excel_csv(tabstats$stats, file)
+      if (!is.null(tabstats$stats2)){readr::write_excel_csv(as.data.frame(tabstats$stats2), file) }}
+    # filename = function() {
+    #   paste("Stat-on-dataset",".xlsx", sep="")
+    # },
+    # content = function(file) {
+    #   sht<-paste0("by",input$bylist)
+    #   xlsx::write.xlsx(tabstats$stats, file, sheetName="global",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
+    #   if (!is.null(tabstats$stats2)){xlsx::write.xlsx(as.data.frame(tabstats$stats2), file, sheetName=sht,row.names=FALSE, col.names=TRUE,append=TRUE, showNA=TRUE)
+    #   }},contentType ="application/vnd.ms-excel"
 
   )
 
@@ -693,12 +700,19 @@ shinyServer(function(input, output){
   ### Téléchargement de la table de stats en sortie:
   output$download_stats_cat <-  downloadHandler(
     filename = function() {
-      paste("Stat-on-CATvars",".xlsx", sep="")
+      paste("Stat-on-CATvars","csv", sep="")
     },
     content = function(file) {
 
-      xlsx::write.xlsx(as.data.frame(tabstats$statcat), file, sheetName="freq",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
-    },contentType ="application/vnd.ms-excel"
+      readr::write_excel_csv(as.data.frame(tabstats$statcat), file)
+    }
+    # filename = function() {
+    #   paste("Stat-on-CATvars",".xlsx", sep="")
+    # },
+    # content = function(file) {
+    #
+    #   xlsx::write.xlsx(as.data.frame(tabstats$statcat), file, sheetName="freq",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
+    # },contentType ="application/vnd.ms-excel"
 
   )
 
