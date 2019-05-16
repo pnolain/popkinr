@@ -15,6 +15,46 @@ It contains interactive web-applications based on `shiny` for:
 
 *Reference: [PopkinR: a suite of Shiny applications focused on the pharmacometrics workflow](https://www.page-meeting.org/pdf_assets/7336-PAGE%20Poster%20PopkinR%20-%20Final%20version.pdf) presented at PAGE 2018*
 
+Installation
+------------
+
+``` r
+# Install the latest version from GitHub
+# install.packages('devtools')
+
+# Install pmxploit package first
+devtools::install_github('pnolain/pmxploit')
+
+# Install PopkinR
+devtools::install_github('pnolain/popkinr')
+```
+
+Getting started with the applications
+-------------------------------------
+
+``` r
+library(popkinr)
+
+# PMXploit
+nonmem_toolbox()
+# PMXploit with VPC feature
+nonmem_toolbox(nonmem_exe = "/path/to/nonmem/run/nmfe74",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe")
+
+# PMXecute
+nonmem_monitor(nonmem_exe = "/path/to/nonmem/run/nmfe74",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe",
+               nonmem_parafile = "/path/to/nonmem/runfiles/mpilinux8.pnm")
+
+# PMXecute (with PsN execute)
+nonmem_monitor(nonmem_exe = "/usr/local/bin/execute",
+               nonmem_call = "{nonmem_exe} {control_file} -nodes={n_nodes}",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe")
+
+# PMXplore
+dataset_exploration()
+```
+
 PMXploit `popkinr::nonmem_toolbox` <img id="logo" src="pkgdown/pmxploit.svg" alt="pmxploit" width="125px" align="right" />
 --------------------------------------------------------------------------------------------------------------------------
 
@@ -41,11 +81,3 @@ Application for exploratory data analysis of NONMEM-like datasets.
 Provides interactive visualizations and summaries of dependent variables, dosing regimens and covariates (distributions, longitudinal evolution) and dataset manipulation functionalities.
 
 *Gif preview...*
-
-Installation
-============
-
-Packages dependencies
----------------------
-
-*R packages requirement list per app...*

@@ -44,7 +44,6 @@ Imports:
   tibble,
   tidyr,
   vpc,
-  xlsx,
   xml2,
   zoo
 LazyData: true
