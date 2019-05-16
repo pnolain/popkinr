@@ -55,29 +55,57 @@ nonmem_monitor(nonmem_exe = "/usr/local/bin/execute",
 dataset_exploration()
 ```
 
-PMXploit `popkinr::nonmem_toolbox` <img id="logo" src="pkgdown/pmxploit.svg" alt="pmxploit" width="125px" align="right" />
---------------------------------------------------------------------------------------------------------------------------
+### PMXploit `popkinr::nonmem_toolbox` <img id="logo" src="pkgdown/pmxploit.svg" alt="pmxploit" width="125px" align="right" />
 
 Together with the [**pmxploit**](https://github.com/pnolain/pmxploit) package, brings interactivity to NONMEM runs post-processing analysis.
 
 Dynamically generates corresponding R-code to most of the plots and tables provided by the application so it can be embedded in any R script.
 
+``` r
+library(popkinr)
+
+# PMXploit
+nonmem_toolbox()
+# PMXploit with VPC feature
+nonmem_toolbox(nonmem_exe = "/path/to/nonmem/run/nmfe74",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe")
+```
+
 ![pmxploit](pkgdown/pmxploit.gif)
 
-PMXecute `popkinr::nonmem_monitor` <img id="logo" src="pkgdown/pmxecute.svg" alt="pmxecute" width="125px" align="right" />
---------------------------------------------------------------------------------------------------------------------------
+### PMXecute `popkinr::nonmem_monitor` <img id="logo" src="pkgdown/pmxecute.svg" alt="pmxecute" width="125px" align="right" />
 
 Application for launching and monitoring NONMEM runs on a local setup.
 
 Provides control file generation functionalities for models with $PRIOR, $CHAIN processing or bootstrapping.
 
+``` r
+library(popkinr)
+
+# PMXecute
+nonmem_monitor(nonmem_exe = "/path/to/nonmem/run/nmfe74",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe",
+               nonmem_parafile = "/path/to/nonmem/runfiles/mpilinux8.pnm")
+
+# PMXecute (with PsN execute)
+nonmem_monitor(nonmem_exe = "/usr/local/bin/execute",
+               nonmem_call = "{nonmem_exe} {control_file} -nodes={n_nodes}",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe")
+```
+
 *Gif preview...*
 
-PMXplore `popkinr::dataset_exploration` <img id="logo" src="pkgdown/pmxplore.svg" alt="pmxplore" width="125px" align="right" />
--------------------------------------------------------------------------------------------------------------------------------
+### PMXplore `popkinr::dataset_exploration` <img id="logo" src="pkgdown/pmxplore.svg" alt="pmxplore" width="125px" align="right" />
 
 Application for exploratory data analysis of NONMEM-like datasets.
 
 Provides interactive visualizations and summaries of dependent variables, dosing regimens and covariates (distributions, longitudinal evolution) and dataset manipulation functionalities.
+
+``` r
+library(popkinr)
+
+# PMXplore
+dataset_exploration()
+```
 
 *Gif preview...*
