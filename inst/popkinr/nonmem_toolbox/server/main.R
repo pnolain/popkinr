@@ -1,87 +1,3 @@
-# # DEBUGGING
-# Sys.setenv(NM_EXE="/usr/local/bin/nmr",
-#            NM_CALL="{nonmem_exe} {control_file} -local",
-#            NMCHECK_EXE="/usr/local/bin/nmr",
-#            NMCHECK_CALL="{nmcheck_exe} {control_file} -test")
-# plan(sequential)
- options(shiny.fullstacktrace = TRUE)
-
-plan(multiprocess)
-
-env_home <- Sys.getenv("HOME")
-env_nm_exe <- Sys.getenv("NM_EXE")
-env_nm_call <- Sys.getenv("NM_CALL")
-env_nmcheck_exe <- Sys.getenv("NMCHECK_EXE")
-env_nmcheck_call <- Sys.getenv("NMCHECK_CALL")
-env_nmtoolbox_path <- Sys.getenv("APP_PATH")
-env_nmtoolbox_root <- Sys.getenv("BROWSER_ROOT")
-env_pmx_startup_path <- Sys.getenv("STARTUP_PATH")
-
-local_app_folder <- ifelse(env_nmtoolbox_path != "",
-                           env_nmtoolbox_path,
-                           str_c(env_home, "popkinr", "nonmem_toolbox", sep = "/"))
-
-if(!dir.exists(local_app_folder)){
-  dir.create(local_app_folder, recursive = TRUE)
-}
-
-# Global UI options
-theme_set(theme_pmx())
-options(DT.options = list(pageLength = 50, dom = "rti"))
-options(shiny.maxRequestSize = 100*1024^2) # 100 MB max
-options(shiny.usecairo = FALSE)
-# rlang deprecation messages
-options(lifecycle_disable_verbose_retirement = TRUE)
-
-rhandsontable <- function(...){
-  rhandsontable::rhandsontable(..., fillHandle = FALSE)
-}
-
-# Styling variables
-rse_warning_breaks <- c(.40, .50, .75, 1)
-rse_warning_colours <- round(seq(255, 100, length.out = length(rse_warning_breaks) + 1), 0) %>%
-  paste0("rgb(255,", ., ",", ., ")")
-
-pvalue_warning_breaks <- c(0, 0.001, 0.01, 0.05, 0.1)
-pvalue_warning_colours <- c(rev(rse_warning_colours), NA)
-
-app_xml_path <- str_c(env_home, "popkinr", "popkinr.xml", sep = "/")
-
-app_temp_directory <- str_c(local_app_folder, "tmp", sep = "/")
-app_temp_comparison_directory <- str_c(local_app_folder, "comparison", sep = "/")
-app_temp_vpc_directory <- str_c(local_app_folder, "vpc", sep = "/")
-cleanup_when_ended <- TRUE
-
-user_initial_selection <- "/"
-
-# application metadata
-startup_last_runs <- tibble(date = as.POSIXct(character()), path = character())
-initial_run_path <- NULL
-
-if(env_pmx_startup_path != "")
-  initial_run_path <- env_pmx_startup_path
-
-if(file.exists(app_xml_path)){
-  doc <- read_xml(app_xml_path)
-
-  run_nodes <- doc %>%
-    xml_find_all("/popkinr/pmxploit/history/run")
-
-  if(length(run_nodes) > 0){
-    last_runs <- as_list(run_nodes) %>%
-      map(~ list(date = lubridate::ymd_hms(attr(., "date")), path = attr(., "path"))) %>%
-      bind_rows() %>%
-      arrange(date)
-
-    startup_last_runs <- last_runs %>%
-      filter(file.exists(path))
-
-    if(nrow(startup_last_runs) > 0)
-      user_initial_selection <- startup_last_runs %>% slice(n()) %>% .$path %>% dirname
-  }
-}
-
-
 # clean up
 session$onSessionEnded(function() {
   if(cleanup_when_ended & dir.exists(app_temp_directory)){
@@ -213,7 +129,7 @@ observe({
   selection_is_nm_run <- FALSE
 
   if(length(run_browser()$file) == 1){
-    selection_is_nm_run <- str_detect(run_browser()$file, "\\.tar\\.gz$")
+    selection_is_nm_run <- str_detect(run_browser()$file, "(\\.tar\\.gz|\\.zip)$")
   } else {
     dir_path <- run_browser()$folder
 
@@ -238,7 +154,8 @@ observeEvent(input$load_run, {
 observeEvent(rv$run_path, {
   path <- req(rv$run_path)
 
-  open_run(path)
+  if(file.exists(path)) # do not run for Demo run
+    open_run(path)
 })
 
 add_run_to_history <- function(run){
@@ -302,7 +219,7 @@ open_run <- function(run_path){
 
   if(length(run_load$warnings) > 0){
     app_warnings <- map_df(run_load$warnings, function(x){
-      data_frame(message = x, status = "warning")
+      tibble(message = x, status = "warning")
     }, .id = NULL)
 
     notifs <- app_warnings
@@ -310,7 +227,7 @@ open_run <- function(run_path){
 
   if(length(run_load$result$error) > 0){
     app_errors <- map_df(run_load$result$error$message, function(x){
-      data_frame(message = x, status = "error")
+      tibble(message = x, status = "error")
     }, .id = NULL)
 
     notifs <- bind_rows(notifs, app_errors)
@@ -514,7 +431,7 @@ filtered_run_reduced <- reactive({
 })
 
 reset_filters <- function(){
-  rv$app_filters <- list(quo(MDV == 0))#data_frame(column = "MDV", operator = "==", value = 0)
+  rv$app_filters <- list(quo(MDV == 0))
 }
 
 reset_ui<-function(){
@@ -555,7 +472,7 @@ observeEvent(input$example, {
   run_browser()$reset()
   metadata_browser()$reset()
 
-  rv$run_path <- NULL
+  rv$run_path <- pmxploit:::EXAMPLERUN$info$path
 
   rv_comp$runs_to_compare <- NULL
 
@@ -624,7 +541,6 @@ observeEvent(input$add_filter,{
   op <- input$filter_operator
   col <- input$filter_columns
 
-  #new_filter <- data_frame(column = input$filter_columns, operator = input$filter_operator, value = val)
   filter_formula <- switch(as.character(val),
                            `NA` = {
                              switch(as.character(op),

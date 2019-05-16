@@ -1,9 +1,12 @@
 library(shiny)
 library(shinydashboard)
 library(DT)
+library(shinyTree)
 library(shinyjs)
 library(R6)
 library(shinytoastr)
+library(shinyAce)
+library(shinycssloaders)
 
 library(ggplot2)
 library(tidyr)
@@ -16,7 +19,6 @@ library(lubridate)
 library(hms)
 
 library(pmxploit)
-library(pmxecute)
 
 library(future)
 library(promises)
@@ -26,7 +28,7 @@ plan(multiprocess) # multicore if supported, otherwise multisession
 # plan(sequential)
 
 source("modules/controlStreamUI.R")
-source("modules/serverbrowser.R")
+# source("modules/serverbrowser.R")
 
 app_title <- "PopkinR - NONMEM Monitor"
 
@@ -58,12 +60,11 @@ dashboardPage(
       ),
       h6(
         sprintf(
-          "PMXecute version: %s (%s)",
-          packageDescription("pmxecute")$Version,
-          packageDescription("pmxecute")$Date
+          "PopkinR version: %s (%s)",
+          packageDescription("popkinr")$Version,
+          packageDescription("popkinr")$Date
         )
-      ),
-      h6("Patrick Nolain, M&S Montpellier")
+      )
     )
   ),
   dashboardBody(

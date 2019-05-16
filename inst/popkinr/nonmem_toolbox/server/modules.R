@@ -22,7 +22,7 @@ run_browser_formatting <- function(id, text){
   is_nm_run <- is_nm_run_folder(id)
   if(is_nm_run) return(sprintf("<span style='color:red;'>%s</span>", text))
 
-  has_archives <- (length(list.files(id, pattern = "\\.tar\\.gz$", ignore.case = TRUE)) > 0)
+  has_archives <- (length(list.files(id, pattern = "(\\.tar\\.gz|\\.zip)$", ignore.case = TRUE)) > 0)
   if(has_archives) return(sprintf("<strong>%s</strong>", text))
 
   text
@@ -31,7 +31,7 @@ run_browser_formatting <- function(id, text){
 run_browser <- callModule(popkinr::serverBrowser, "run_browser",
                           root_directory = browsing_root,
                           initial_selection = user_initial_selection,
-                          file_extensions = "tar.gz",
+                          file_extensions = c("tar.gz", "zip"),
                           folder_shortcuts = reactive({
                             if(nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
                           }),
@@ -40,7 +40,7 @@ run_browser <- callModule(popkinr::serverBrowser, "run_browser",
 metadata_browser <- callModule(popkinr::serverBrowser, "metadata_browser",
                                root_directory = browsing_root,
                                initial_selection = user_initial_selection,
-                               file_extensions = "tar.gz",
+                               file_extensions = c("tar.gz", "zip"),
                                folder_shortcuts = reactive({
                                  if(nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
                                }),
@@ -49,25 +49,25 @@ metadata_browser <- callModule(popkinr::serverBrowser, "metadata_browser",
 comparison_browser <- callModule(popkinr::serverBrowser, "comparison_browser",
                                  root_directory = browsing_root,
                                  initial_selection = user_initial_selection,
-                                 file_extensions = "tar.gz",
+                                 file_extensions = c("tar.gz", "zip"),
                                  folder_shortcuts = reactive({
                                    if(nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
                                  }),
                                  formatting_function = run_browser_formatting)
 
 # table modules----
-callModule(extendedDTnew, "thetas_table", reactive_table = reactive(run_thetas_table()), filename = "THETAs")
-callModule(extendedDTnew, "omega_table", reactive_table = reactive(run_omega_table()), filename = "OMEGA")
-callModule(extendedDTnew, "eta_bars_table", reactive_table = reactive(run_eta_bars_table()), filename = "ETA-bars")
-callModule(extendedDTnew, "sigma_table", reactive_table = reactive(run_sigma_table()), filename = "SIGMA")
-callModule(extendedDTnew, "eta_shrinkage_table", reactive_table = reactive(run_eta_shrinkage_table()), filename = "ETA-shrinkage")
-callModule(extendedDTnew, "eps_shrinkage_table", reactive_table = reactive(run_eps_shrinkage_table()), filename = "EPS-shinkage")
+callModule(extendedDT_with_code, "thetas_table", reactive_table = reactive(run_thetas_table()), filename = "THETAs")
+callModule(extendedDT_with_code, "omega_table", reactive_table = reactive(run_omega_table()), filename = "OMEGA")
+callModule(extendedDT_with_code, "eta_bars_table", reactive_table = reactive(run_eta_bars_table()), filename = "ETA-bars")
+callModule(extendedDT_with_code, "sigma_table", reactive_table = reactive(run_sigma_table()), filename = "SIGMA")
+callModule(extendedDT_with_code, "eta_shrinkage_table", reactive_table = reactive(run_eta_shrinkage_table()), filename = "ETA-shrinkage")
+callModule(extendedDT_with_code, "eps_shrinkage_table", reactive_table = reactive(run_eps_shrinkage_table()), filename = "EPS-shinkage")
 
 
 callModule(extendedDT, "parameters_individual_table", reactive_table = reactive(individual_parameters()),
            rownames = FALSE,
            filename = "individual_parameters", options = list(pageLength = 20, dom = 'ip'))
-callModule(extendedDTnew, "parameters_distributions_summary", reactive_table = reactive(run_parameters_summary_table()),
+callModule(extendedDT_with_code, "parameters_distributions_summary", reactive_table = reactive(run_parameters_summary_table()),
            rownames = FALSE,
            filename = "parameters_summary", options = list(paging = FALSE))
 

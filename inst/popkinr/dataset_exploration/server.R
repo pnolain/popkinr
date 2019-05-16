@@ -11,7 +11,7 @@ shinyServer(function(input, output){
   filedata <- reactive({
 
     if(!is.null(values$dataset_path)& input$Demo==0){
-        if( str_detect(values$dataset_path, "\\.tar\\.gz$")){
+        if( str_detect(values$dataset_path, "(\\.tar\\.gz|\\.zip)$")){
         run <- pmxploit::load_nm_run(values$dataset_path, temp_directory = str_c(tempdir(), "pmxploit"),
                               load_tables = TRUE, read_initial_values = TRUE,
                               keep_tempfiles = FALSE, extract_everything = FALSE,
@@ -112,7 +112,7 @@ shinyServer(function(input, output){
   #Je mets les infos globales dans les valueBOX
   output$check_box <- renderInfoBox({
 
-     infileraw <- values$dataset_path #if (is.null(values$dataset_path)){NULL} else if( str_detect(values$dataset_path, "\\.tar\\.gz$")){NULL} else {values$dataset_path}
+     infileraw <- values$dataset_path
 
     if (is.null(infileraw) && input$Demo==0) {
       textfile="Welcome in PMxplore !!! Select your dataset !"
@@ -121,7 +121,7 @@ shinyServer(function(input, output){
       labelcheck=""
 
     }
-    else if (!is.null(infileraw) && str_detect(infileraw, "\\.tar\\.gz$")==F){
+    else if (!is.null(infileraw) && str_detect(infileraw, "(\\.tar\\.gz|\\.zip)$")==F){
       L=readLines(infileraw)
       L1=readLines(infileraw,n=1)
 
@@ -140,7 +140,7 @@ shinyServer(function(input, output){
     }
 
 
-     else if(!is.null(infileraw) && str_detect(infileraw, "\\.tar\\.gz$")){
+     else if(!is.null(infileraw) && str_detect(infileraw, "(\\.tar\\.gz|\\.zip)$")){
        textfile= "OK nm"
        colorcheck="green"
        iconcheck='check-square'
@@ -336,13 +336,20 @@ shinyServer(function(input, output){
   ### Téléchargement de la table de stats en sortie:
   output$download_stats <-  downloadHandler(
     filename = function() {
-      paste("Stat-on-dataset",".xlsx", sep="")
+      paste("Stat-on-dataset",".csv", sep="")
     },
     content = function(file) {
       sht<-paste0("by",input$bylist)
-      xlsx::write.xlsx(tabstats$stats, file, sheetName="global",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
-      if (!is.null(tabstats$stats2)){xlsx::write.xlsx(as.data.frame(tabstats$stats2), file, sheetName=sht,row.names=FALSE, col.names=TRUE,append=TRUE, showNA=TRUE)
-      }},contentType ="application/vnd.ms-excel"
+      readr::write_excel_csv(tabstats$stats, file)
+      if (!is.null(tabstats$stats2)){readr::write_excel_csv(as.data.frame(tabstats$stats2), file) }}
+    # filename = function() {
+    #   paste("Stat-on-dataset",".xlsx", sep="")
+    # },
+    # content = function(file) {
+    #   sht<-paste0("by",input$bylist)
+    #   xlsx::write.xlsx(tabstats$stats, file, sheetName="global",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
+    #   if (!is.null(tabstats$stats2)){xlsx::write.xlsx(as.data.frame(tabstats$stats2), file, sheetName=sht,row.names=FALSE, col.names=TRUE,append=TRUE, showNA=TRUE)
+    #   }},contentType ="application/vnd.ms-excel"
 
   )
 
@@ -693,12 +700,19 @@ shinyServer(function(input, output){
   ### Téléchargement de la table de stats en sortie:
   output$download_stats_cat <-  downloadHandler(
     filename = function() {
-      paste("Stat-on-CATvars",".xlsx", sep="")
+      paste("Stat-on-CATvars","csv", sep="")
     },
     content = function(file) {
 
-      xlsx::write.xlsx(as.data.frame(tabstats$statcat), file, sheetName="freq",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
-    },contentType ="application/vnd.ms-excel"
+      readr::write_excel_csv(as.data.frame(tabstats$statcat), file)
+    }
+    # filename = function() {
+    #   paste("Stat-on-CATvars",".xlsx", sep="")
+    # },
+    # content = function(file) {
+    #
+    #   xlsx::write.xlsx(as.data.frame(tabstats$statcat), file, sheetName="freq",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
+    # },contentType ="application/vnd.ms-excel"
 
   )
 
@@ -1479,21 +1493,11 @@ shinyServer(function(input, output){
 
 
   # Server
-  # dataset_browser_formatting <- function(id, text){
-  #   # `id` is the path of the tree node
-  #   is_nm_run <- is_nm_run_folder(id)
-  #   if(is_nm_run) return(sprintf("<span style='color:red;'>%s</span>", text))
-  #
-  #   has_archives <- (length(list.files(id, pattern = "\\.tar\\.gz$", ignore.case = TRUE)) > 0)
-  #   if(has_archives) return(sprintf("<strong>%s</strong>", text))
-  #
-  #   text
-  # }
 
   dataset_browser <- callModule(popkinr::serverBrowser, "dataset_browser",
                                 root_directory = browsing_root,
                                 initial_selection = user_initial_selection,
-                                file_extensions = c("dat", "csv", "xslx","tar.gz"),
+                                file_extensions = c("dat", "csv", "xslx","tar.gz", "zip"),
                                 folder_shortcuts = reactive({
                                   if(nrow(startup_last_runs) > 0) return(dirname(startup_last_runs$path))
                                 })
@@ -1509,7 +1513,7 @@ shinyServer(function(input, output){
       title = "Select a dataset file",
       size = "l",
       popkinr::serverBrowserUI("dataset_browser"),
-      # div(tags$em("* Legend: Bold: directories containing *.tar.gz archive files; Red: directories containing NONMEM run data")),
+      # div(tags$em("* Legend: Bold: directories containing *.tar.gz or *.zip archive files; Red: directories containing NONMEM run data")),
       footer = list(modalButton("Close"),
                     actionButton("load_dataset", "Load selection")),
       easyClose = TRUE)
