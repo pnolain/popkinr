@@ -25,7 +25,6 @@ if(!dir.exists(local_app_folder)){
 theme_set(theme_pmx())
 options(DT.options = list(pageLength = 50, dom = "rti"))
 options(shiny.maxRequestSize = 100*1024^2) # 100 MB max
-options(shiny.usecairo = FALSE)
 # rlang deprecation messages
 options(lifecycle_disable_verbose_retirement = TRUE)
 

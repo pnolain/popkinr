@@ -6,7 +6,6 @@ suppressPackageStartupMessages({
   library(shinyAce)
   library(shinytoastr)
   library(rhandsontable)
-  library(Cairo)
   library(ggplot2)
   library(tidyr)
   library(dplyr)
