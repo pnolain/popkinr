@@ -1264,15 +1264,13 @@ shinyServer(function(input, output){
   output$NCA_stat_data <- DT::renderDataTable({
 
 
-    values$NCA_stat_table
+    datatable(values$NCA_stat_table, rownames=F, options=list(paging=F, ordering= F, scrollX=F, filter=F,initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().header()).css({'background-color': '#86B2AC', 'color': '#000'});",
+      "}"))) %>% formatStyle('stat',  color = 'black', backgroundColor = '#86B2AC', fontWeight = 'bold')
 
-  },
-  options = list(pageLength = 20,lengthMenu=c(20,40,100), dom = 'lftip', paging=TRUE, scrollX = TRUE,  filter='top',
-                 initComplete = JS(
-                   "function(settings, json) {",
-                   "$(this.api().table().header()).css({'background-color': '#4682B4', 'color': '#fff'});",
-                   "}")
-  ))
+  }
+  )
 
 
 
