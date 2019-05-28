@@ -13,6 +13,7 @@ library(stringr)
 library(purrr)
 library(xml2)
 library(ggplot2)
+library(readr)
 
 library(plotly)
 library(rhandsontable)
@@ -412,7 +413,8 @@ shinyUI(
                   height = "1000px",
 
                   tabPanel("NCA results" , DT::dataTableOutput("NCAdata")),
-                  tabPanel ("Data",DT::dataTableOutput("NCA_inputdata"))
+                  tabPanel ("Data",DT::dataTableOutput("NCA_inputdata")),
+                  tabPanel ("Desc. Stats",DT::dataTableOutput("NCA_stat_data"))
                   # tabPanel("Plots")
                 ))
                 #tableOutput("filtered_data_view")
