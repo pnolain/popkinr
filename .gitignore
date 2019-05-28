@@ -27,13 +27,8 @@ vignettes/*.pdf
 *.knit.md
 # End of https://www.gitignore.io/api/r
 .Rproj.user
-inst/doc
 
 # custom
-# pkgdown website
-docs/
-# Processed documentation
-man/
-misc/
 # all *.tar.gz
 *.tar.gz
+misc/

@@ -83,13 +83,15 @@
     list(test = ks,
          residual = res,
          mean = mean(values),
-         sd = sd(values))
+         sd = sd(values),
+         N = length(values),
+         `N unique` = length(unique(values)))
   })
 
   output$outliers_ks_table <- renderDataTable({
     ks <- req(outliers_ks_test())
 
-    stats_df <- data_frame(mean = ks$mean, sd = ks$sd) %>%
+    stats_df <- tibble(mean = ks$mean, sd = ks$sd, N = ks$N, `N unique` = ks$`N unique`) %>%
       rename(!!!setNames(nm = sprintf("%s (%s)", ks$res, colnames(.)), colnames(.)))
 
     test_df <- broom::tidy(ks$test) %>%
@@ -133,11 +135,11 @@
 
     brush <- input[[ns("brush")]]
 
-    selected_subjects <- data_frame(ID = numeric())
+    selected_subjects <- tibble(ID = numeric())
 
     b_df <- brushedPoints(data, brush, xvar = "QUANTILE_NORMALDIST", yvar = "Residuals_Value") %>% select(-QUANTILE_NORMALDIST)
 
-    df <- data_frame(ID = numeric(), TIME = numeric(), RES = numeric())
+    df <- tibble(ID = numeric(), TIME = numeric(), RES = numeric())
 
     if(nrow(b_df) > 0){
       run <- filtered_run()
@@ -146,7 +148,7 @@
 
       df <- run$tables$pmxploitab %>%
         semi_join(b_df, by = join_cols) %>%
-        select(ID, CMT, one_of(res_type, run$model$regressors$column))
+        select(ID, CMT, one_of(res_type, run$model$independent_variables$column))
     }
 
     datatable(df, options = list(pageLength = 20, dom = 'rtip', scrollX = TRUE))
@@ -229,13 +231,7 @@
 
     g
   })
-#
-#   output$outliers_boxplot_table <- renderDataTable({
-#     out_data <- req(outliers_boxplot_detection())
-#
-#     datatable(out_data$outliers, rownames = FALSE,
-#               options = list(pageLength = 20, dom = 'rtip'))
-#   })
+
 
   output$outliers_boxplot_message <- renderText({
     out_data <- req(outliers_boxplot_detection())

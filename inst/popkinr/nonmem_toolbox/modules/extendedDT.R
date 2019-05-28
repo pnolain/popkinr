@@ -84,19 +84,19 @@ extendedDT <- function(input, output, session, reactive_table, filename = "table
       toolbar_content <-  sprintf('<label for="%s">Significant digits</label><input id="%s" type="number" class="form-control" value="%s" />',
                                   dig_widget, dig_widget, n_digits)
       export_content <- sprintf('<label for="%s">All data</label><br /><a id="%s" class="btn btn-default shiny-download-link " href="%s" target="_blank"><i class="fa fa-download" />&nbsp;Export (*.csv)</a>',
-                                  export_id, export_id,
-                                  session$registerDownload(name = export_id,
-                                                           contentType = NA,
-                                                           filename = function() {paste0(filename, ".csv")
-                                                           },
-                                                           function(file){
-                                                             df <- req(inner_table())
+                                export_id, export_id,
+                                session$registerDownload(name = export_id,
+                                                         contentType = NA,
+                                                         filename = function() {paste0(filename, ".csv")
+                                                         },
+                                                         function(file){
+                                                           df <- req(inner_table())
 
-                                                             if(is(df, "datatables"))
-                                                               df <- df$x$data
+                                                           if(is(df, "datatables"))
+                                                             df <- df$x$data
 
-                                                             write_excel_csv(df, file, na = ".")
-                                                           }))
+                                                           write_excel_csv(df, file, na = ".")
+                                                         }))
 
       dt$x$options$drawCallback <- JS(sprintf("function() {$('#%s').html('%s'); $('#%s').html('<label>Current view</label>'); $('#%s').html('%s');}",
                                               toolbar_id,

@@ -1,45 +1,111 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+[![CRAN status](https://www.r-pkg.org/badges/version/popkinr)](https://cran.r-project.org/package=popkinr)
+
 popkinr
 =======
 
-The goal of popkinr is to ...
+PopkinR is an R package aiming at facilitating the development of non-linear mixed effects models with NONMEM.
+
+It contains interactive web-applications based on `shiny` for:
+
+-   Post-processing of NONMEM runs results (`PMXploit`)
+-   Launch of NONMEM runs and editing control files (`PMXecute`)
+-   Exploration of NONMEM-like datasets (`PMXplore`)
+
+*Reference: [PopkinR: a suite of Shiny applications focused on the pharmacometrics workflow](https://www.page-meeting.org/pdf_assets/7336-PAGE%20Poster%20PopkinR%20-%20Final%20version.pdf) presented at PAGE 2018*
 
 Installation
 ------------
 
-You can install the released version of popkinr from [CRAN](https://CRAN.R-project.org) with:
-
 ``` r
-install.packages("popkinr")
+# Install the latest version from GitHub
+# install.packages('devtools')
+
+# Install pmxploit package first
+devtools::install_github('pnolain/pmxploit')
+
+# Install PopkinR
+devtools::install_github('pnolain/popkinr')
 ```
 
-Example
--------
-
-This is a basic example which shows you how to solve a common problem:
+Getting started with the applications
+-------------------------------------
 
 ``` r
-## basic example code
+library(popkinr)
+
+# PMXploit
+nonmem_toolbox()
+# PMXploit with VPC feature
+nonmem_toolbox(nonmem_exe = "/path/to/nonmem/run/nmfe74",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe")
+
+# PMXecute
+nonmem_monitor(nonmem_exe = "/path/to/nonmem/run/nmfe74",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe",
+               nonmem_parafile = "/path/to/nonmem/runfiles/mpilinux8.pnm")
+
+# PMXecute (with PsN execute)
+nonmem_monitor(nonmem_exe = "/usr/local/bin/execute",
+               nonmem_call = "{nonmem_exe} {control_file} -nodes={n_nodes}",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe")
+
+# PMXplore
+dataset_exploration()
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+### PMXploit `popkinr::nonmem_toolbox` <img id="logo" src="pkgdown/pmxploit.svg" alt="pmxploit" width="125px" align="right" />
+
+Together with the [**pmxploit**](https://github.com/pnolain/pmxploit) package, brings interactivity to NONMEM runs post-processing analysis.
+
+Dynamically generates corresponding R-code to most of the plots and tables provided by the application so it can be embedded in any R script.
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+library(popkinr)
+
+# PMXploit
+nonmem_toolbox()
+# PMXploit with VPC feature
+nonmem_toolbox(nonmem_exe = "/path/to/nonmem/run/nmfe74",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe")
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
+![pmxploit](pkgdown/pmxploit.gif)
 
-You can also embed plots, for example:
+### PMXecute `popkinr::nonmem_monitor` <img id="logo" src="pkgdown/pmxecute.svg" alt="pmxecute" width="125px" align="right" />
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+Application for launching and monitoring NONMEM runs on a local setup.
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
+Provides control file generation functionalities for models with $PRIOR, $CHAIN processing or bootstrapping.
+
+``` r
+library(popkinr)
+
+# PMXecute
+nonmem_monitor(nonmem_exe = "/path/to/nonmem/run/nmfe74",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe",
+               nonmem_parafile = "/path/to/nonmem/runfiles/mpilinux8.pnm")
+
+# PMXecute (with PsN execute)
+nonmem_monitor(nonmem_exe = "/usr/local/bin/execute",
+               nonmem_call = "{nonmem_exe} {control_file} -nodes={n_nodes}",
+               nmcheck_exe = "/path/to/nonmem/tr/NMTRAN.exe")
+```
+
+*Gif preview...*
+
+### PMXplore `popkinr::dataset_exploration` <img id="logo" src="pkgdown/pmxplore.svg" alt="pmxplore" width="125px" align="right" />
+
+Application for exploratory data analysis of NONMEM-like datasets.
+
+Provides interactive visualizations and summaries of dependent variables, dosing regimens and covariates (distributions, longitudinal evolution) and dataset manipulation functionalities.
+
+``` r
+library(popkinr)
+
+# PMXplore
+dataset_exploration()
+```
+
+*Gif preview...*

@@ -5,7 +5,7 @@ observeEvent(input$select_run, {
       title = "Select a run folder or archive",
       size = "l",
       popkinr::serverBrowserUI("run_browser"),
-      div(tags$em("* Legend: Bold: directories containing *.tar.gz archive files; Red: directories containing NONMEM run data")),
+      div(tags$em("* Legend: Bold: directories containing *.tar.gz or *.zip archive files; Red: directories containing NONMEM run data")),
       footer = list(modalButton("Close"),
                     actionButton("load_run", "Load selection")),
       easyClose = TRUE)
@@ -40,22 +40,21 @@ output$estimations_table <- renderDataTable({
     run <- req(rv$run)
 
     est_table <- map_df(run$estimations, function(est){
-      data_frame(#N = est$number,
-        Method = est$title,
-        Minimization = ifelse(est$failed, "Failed",
-                              ifelse(!est$minimization, "No minimization",
-                                     ifelse(est$termination_status == 0, "Successful", "Terminated"))),
-        `Final OFV` = est$final_ofv,
-        Eigenratio = est$eigenratio,
-        Correlation = est$correlation,
-        AIC = est$aic,
-        BIC = est$bic,
-        `CPU` = ifelse(!is.null(est$parallel), est$parallel$nodes, 1),
-        `Significant digits` = est$significant_digits,
-        `Function evaluations` = est$nfuncevals,
-        Messages = ifelse(!is.null(est$termination_messages),
-                          paste(est$termination_messages$message, collapse = "<br />"),
-                          NA))
+      tibble(Method = est$title,
+             Minimization = ifelse(est$failed, "Failed",
+                                   ifelse(!est$minimization, "No minimization",
+                                          ifelse(est$termination_status == 0, "Successful", "Terminated"))),
+             `Final OFV` = est$final_ofv,
+             Eigenratio = est$eigenratio,
+             Correlation = est$correlation,
+             AIC = est$aic,
+             BIC = est$bic,
+             `CPU` = ifelse(!is.null(est$parallel), est$parallel$nodes, 1),
+             `Significant digits` = est$significant_digits,
+             `Function evaluations` = est$nfuncevals,
+             Messages = ifelse(!is.null(est$termination_messages),
+                               paste(est$termination_messages$message, collapse = "<br />"),
+                               NA))
     }, .id = NULL) %>%
       mutate_if(is.numeric, ~ round(., 2))
 
@@ -99,7 +98,7 @@ output$estimations_table <- renderDataTable({
     run <- req(rv$run)
     dur <- run$info$duration
 
-    infoBox("Run duration", value = lubridate::seconds_to_period(dur),
+    infoBox("Run duration", value = lubridate::seconds_to_period(round(dur)),
             color = "green", icon = icon("hourglass-end"))
   })
 

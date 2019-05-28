@@ -54,85 +54,90 @@ observe({
   input$perform_nmcheck
   check_trigger$depend()
 
-  isolate({
-    # Perform a NMTRAN check only if control file was edited
-    df <- req(rv$control_files) %>%
-      mutate(to_update = pmap_lgl(list(filepath, last_edition, parsing),
-                                  function(x, y, z) (length(z) == 0 || file.mtime(x) > y)))
+  if(file.exists(env_nmcheck_exe)){
+    isolate({
+      # Perform a NMTRAN check only if control file was edited
+      df <- req(rv$control_files) %>%
+        mutate(to_update = pmap_lgl(list(filepath, last_edition, parsing),
+                                    function(x, y, z) (length(z) == 0 || file.mtime(x) > y)))
 
-    if(any(df$to_update)){
-      i_rows <- which(df$to_update)
-      n_tu <- length(i_rows)
+      if(any(df$to_update)){
+        i_rows <- which(df$to_update)
+        n_tu <- length(i_rows)
 
 
-      selected_cs <- control_file_detail()
+        selected_cs <- control_file_detail()
 
-      withProgress({
+        withProgress({
 
-        safe_parse <- safely(parse_nm_control_stream)
-        go_check <- function(cs_path, cs_data){
-          res <- NULL
+          safe_parse <- safely(parse_nm_control_stream)
+          go_check <- function(cs_path, cs_data){
+            res <- NULL
 
-          if(!is.null(cs_data$error)){ # if pmxploit parsing error
-            list(path = cs_path,
-                 error = NA,
-                 message = cs_data$error$message)
-          }
+            if(!is.null(cs_data$error)){ # if pmxploit parsing error
+              list(path = cs_path,
+                   error = NA,
+                   message = cs_data$error$message)
+            }
 
-          if(file.access(dirname(cs_path), mode = 2) == -1){
-            if(is.null(cs_data$result$dataset_file))
-              return(NULL)
+            if(file.access(dirname(cs_path), mode = 2) == -1){
+              if(is.null(cs_data$result$dataset_file))
+                return(NULL)
 
-            dataset <- paste(dirname(cs_path), cs_data$result$dataset_file, sep = "/")
+              dataset <- paste(dirname(cs_path), cs_data$result$dataset_file, sep = "/")
 
-            run_files <- c(cs_path, dataset)
+              run_files <- c(cs_path, dataset)
 
-            temp_path <- paste(app_temp_directory, basename(run_files), sep = "/")
-            file.copy(run_files, temp_path)
+              temp_path <- paste(app_temp_directory, basename(run_files), sep = "/")
+              file.copy(run_files, temp_path)
 
-            check <- nm_check(control_file = temp_path[1],
+              check <- nm_check(control_file = temp_path[1],
+                                nmcheck_exe = env_nmcheck_exe,
+                                call_template = env_nmcheck_call)
+
+              file.remove(temp_path)
+
+              res <- check
+            } else {
+              res <- nm_check(control_file = cs_path,
                               nmcheck_exe = env_nmcheck_exe,
                               call_template = env_nmcheck_call)
-
-            file.remove(temp_path)
-
-            res <- check
-          } else {
-            res <- nm_check(control_file = cs_path,
-                            nmcheck_exe = env_nmcheck_exe,
-                            call_template = env_nmcheck_call)
-          }
-
-          if(!is.null(selected_cs) && selected_cs$filepath == cs_path){
-            if(res$error){
-              toastr_error(message = "An error was detected, see NM-TRAN check message", title = "NM-TRAN check",
-                           timeOut = 3000,
-                           position = "top-center", closeButton = TRUE)
-            } else {
-              toastr_success(message = "Done !", title = "NM-TRAN check",
-                             timeOut = 1000,
-                             position = "top-center", closeButton = TRUE)
             }
+
+            if(!is.null(selected_cs) && selected_cs$filepath == cs_path){
+              if(res$error){
+
+
+                toastr_error(message = "An error was detected, see NM-TRAN check message", title = "NM-TRAN check",
+                             timeOut = 3000,
+                             position = "top-center", closeButton = TRUE)
+              } else {
+                toastr_success(message = "Done !", title = "NM-TRAN check",
+                               timeOut = 1000,
+                               position = "top-center", closeButton = TRUE)
+              }
+            }
+
+            incProgress(amount = (1 - 0.1) / n_tu, detail = basename(cs_path))
+
+            res
           }
 
-          incProgress(amount = (1 - 0.1) / n_tu, detail = basename(cs_path))
+          for(i in i_rows){
+            df[i,]$parsing <- map(df[i,]$filepath, safe_parse)
+            df[i,]$nmtran_test <-  map2(df[i,]$filepath, df[i,]$parsing, go_check)
+            df[i,]$last_edition <- file.mtime(df[i,]$filepath)
+          }
+        }, message = "Performing NM-TRAN test", value = 0.1)
+      }
 
-          res
-        }
+      df <- df %>%
+        mutate(error = map_lgl(nmtran_test, "error"))
 
-        for(i in i_rows){
-          df[i,]$parsing <- map(df[i,]$filepath, safe_parse)
-          df[i,]$nmtran_test <-  map2(df[i,]$filepath, df[i,]$parsing, go_check)
-          df[i,]$last_edition <- file.mtime(df[i,]$filepath)
-        }
-      }, message = "Performing NM-TRAN test", value = 0.1)
-    }
+      rv$control_files <- select(df, -to_update)
+    })
 
-    df <- df %>%
-      mutate(error = map_lgl(nmtran_test, "error"))
-
-    rv$control_files <- select(df, -to_update)
-  })
+  }
 
 })
 
@@ -333,7 +338,6 @@ observe({
   shinyjs::toggleState("save_control_file", condition = has_rights)
   shinyjs::toggleState("control_file_editor", condition = has_rights)
 })
-
 
 observeEvent(input$save_control_file, {
   selected_cs <- req(control_file_detail())

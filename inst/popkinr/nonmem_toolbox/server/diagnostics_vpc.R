@@ -16,6 +16,10 @@ output$nmcheck_exe <- renderUI({
   textInput("nmcheck_exe", "NM-TRAN check executable", nmcheck_exe)
 })
 
+output$vpc_location <- renderUI({
+  h6("*NONMEM raw outputs will be located at:", app_temp_vpc_directory)
+})
+
 output$vpc_cmt <- renderUI({
   # keep currently selected compartment
   current_selection <- isolate(input$cmt)
@@ -23,6 +27,12 @@ output$vpc_cmt <- renderUI({
   cmt_choices <- req(run_dv_cmts())
 
   selectInput("vpc_cmt", "Selection", choices = cmt_choices, selected = current_selection)
+})
+
+output$vpc_idv <- renderUI({
+  run <- req(rv$run)
+
+  selectInput("vpc_idv", "Independent variable", set_names(run$model$independent_variables$column, run$model$independent_variables$name))
 })
 
 strat_columns <- reactive({
@@ -168,12 +178,14 @@ observeEvent(input$vpc_run, {
     }
 
     # Move original files: dataset and extra files (custom subroutines)
-    extra_files <- c(run$control_stream$subroutine$FILES, run$control_stream$extra_files)
+    extra_files <- unique(c(run$control_stream$subroutine$FILES, run$control_stream$extra_files))
 
     files_to_copy <- c(run$control_stream$dataset_file, extra_files)
 
     if(length(files_to_copy) > 0){
-      if(file.info(run$info$path)$isdir){
+      if(run$info$path == pmxploit::EXAMPLERUN$info$path){ # run demo
+        write_csv(run$tables$dataset, path = str_c(app_temp_vpc_directory, "/", run$control_stream$dataset_file), na = ".")
+      } else if(file.info(run$info$path)$isdir){
         file.copy(str_c(run$info$path, files_to_copy, sep = "/"),
                   app_temp_vpc_directory)
       } else {
@@ -186,7 +198,7 @@ observeEvent(input$vpc_run, {
       }
     }
 
-    pmxecute::nm_exec(control_file = str_c(app_temp_vpc_directory, "vpc.ctl", sep = "/"),
+    pmxploit::nm_exec(control_file = str_c(app_temp_vpc_directory, "vpc.ctl", sep = "/"),
                    run_directory = str_c(app_temp_vpc_directory, "run", sep = "/"),
                    nonmem_exe = nm_exe,
                    call_template = env_nm_call,
@@ -367,18 +379,19 @@ run_vpcdb <- reactive({
     }
   }
 
+  idv <- input$vpc_idv
 
-  is_time <- is.hms(obs_df$TIME)
+  is_time <- is.hms(obs_df[idv])
 
-  # prevent TIME column from being in "time" format before calling vpc function
+  # prevent IDV column from being in "time" format before calling vpc function
   if (is_time) {
-    # Fix TIME column with dataset times
+    # Fix IDV column with dataset times
     sim_df <- sim_df %>%
-      select(-TIME) %>%
-      left_join(select(obs_df, ID, TIME), by = "ID") %>%
-      select(REP, ID, TIME, everything())
+      select(-one_of(idv)) %>%
+      left_join(select(obs_df, ID, one_of(idv)), by = "ID") %>%
+      select(REP, ID, one_of(idv), everything())
 
-    # Convert TIME to numeric
+    # Convert IDV to numeric
     sim_df <- sim_df %>% mutate(TIME = as.numeric(TIME))
     obs_df <- obs_df %>% mutate(TIME = as.numeric(TIME))
   }
@@ -386,6 +399,8 @@ run_vpcdb <- reactive({
 
   vpcdb <- vpc(sim = sim_df,
                obs = obs_df,
+               obs_cols = list(idv = input$vpc_idv),
+               sim_cols = list(idv = input$vpc_idv),
                stratify = strat_cols,
                bins = input$vpc_binning,
                n_bins = ifelse(is.na(input$vpc_n_bins), "auto", input$vpc_n_bins),

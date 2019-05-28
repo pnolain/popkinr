@@ -30,6 +30,8 @@ env_nm_call <- Sys.getenv("NM_CALL")
 env_nmcheck_exe <- Sys.getenv("NMCHECK_EXE")
 env_nmcheck_call <- Sys.getenv("NMCHECK_CALL")
 
+shinyjs::toggleState("perform_nmcheck", condition = file.exists(env_nmcheck_exe))
+
 env_nm_parafile_path <- Sys.getenv("NM_PARAFILE")
 env_popkin_monitor_path <- Sys.getenv("APP_PATH")
 env_popkin_root <- ifelse(Sys.getenv("BROWSER_ROOT") != "", Sys.getenv("BROWSER_ROOT"), "/")
@@ -83,7 +85,7 @@ run_browser_formatting <- function(id, text){
   is_nm_run <- is_nm_run_folder(id)
   if(is_nm_run) return(sprintf("<span style='color:red;'>%s</span>", text))
 
-  has_archives <- (length(list.files(id, pattern = "\\.tar\\.gz$", ignore.case = TRUE)) > 0)
+  has_archives <- (length(list.files(id, pattern = "(\\.tar\\.gz|\\.zip)$", ignore.case = TRUE)) > 0)
   if(has_archives) return(sprintf("<strong>%s</strong>", text))
 
   text
@@ -139,14 +141,14 @@ misc_run_browser <- callModule(popkinr::serverBrowser,
                        "misc_run_browser",
                        root_directory = browsing_root,
                        initial_selection = initial_misc_run_selection_folder,
-                       file_extensions = "tar.gz",
+                       file_extensions = c("tar.gz", "zip"),
                        formatting_function = run_browser_formatting)
 
 evaluation_run_browser <- callModule(popkinr::serverBrowser,
                              "evaluation_run_browser",
                              root_directory = browsing_root,
                              initial_selection = initial_evaluation_run_selection_folder,
-                             file_extensions = "tar.gz",
+                             file_extensions = c("tar.gz", "zip"),
                              formatting_function = run_browser_formatting)
 
 

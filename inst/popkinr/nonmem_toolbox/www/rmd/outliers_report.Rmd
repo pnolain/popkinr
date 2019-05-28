@@ -78,7 +78,7 @@ values <- cleaned_df[[params$residuals]]
 
 ks <- ks.test(unique(values), "pnorm", mean = mean(values), sd = sd(values))
 
-stats_df <- data_frame(mean = mean(values), sd = sd(values)) %>%
+stats_df <- tibble(mean = mean(values), sd = sd(values)) %>%
   rename(!!!setNames(nm = sprintf("%s (%s)", params$residuals, colnames(.)), colnames(.)))
 
 test_df <- broom::tidy(ks) %>%

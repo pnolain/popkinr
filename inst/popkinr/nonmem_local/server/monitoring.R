@@ -2,6 +2,11 @@ local_nonmem_pids <- reactivePoll(100, session,
                                   checkFunc = function(){
                                     q_system2 <- quietly(system2)
                                     pidof_cmd <- q_system2("pidof", "nonmem", stdout = TRUE)
+                                    # s_system2 <- safely(system2)
+                                    # pidof_cmd <- s_system2("pidof", "nonmem", stdout = TRUE)
+
+                                    # if(!is.null(pidof_cmd$error))
+                                    #   return("")
 
                                     if(length(pidof_cmd$warnings) > 0)
                                       return("")
@@ -12,6 +17,11 @@ local_nonmem_pids <- reactivePoll(100, session,
                                     pidof_cmd <- system2("pidof", "nonmem", stdout = TRUE)
 
                                     if(length(pidof_cmd) == 0) return(NULL)
+                                    # s_system2 <- safely(system2)
+                                    # pidof_cmd <- s_system2("pidof", "nonmem", stdout = TRUE)
+                                    #
+                                    # if(!is.null(pidof_cmd$error))
+                                    #   return(NULL)
 
                                     pids <- pidof_cmd %>%
                                       str_extract_all("\\d+") %>%
@@ -134,6 +144,8 @@ output$local_run_list <- renderDataTable({
 my_promise_error_handling <- function(error){
   err_msg <- error$message
 
+  # browser()
+
   shinyjs::html("dialog_msg", str_c("<span style='color: red; font-weight: bold;'>", err_msg, "</span>"))
   print(err_msg)
 
@@ -176,7 +188,7 @@ observeEvent(input$show_run_details, {
 
   s_time <- now()
 
-  browser()
+  # browser()
   future({refresh_run_check(r_number, s_time) }) %>%
     then(
       onFulfilled = function(value) {
@@ -202,7 +214,9 @@ observeEvent(input$show_run_details, {
                                 tabBox(
                                   width = 12,
                                   tabPanel(title = "OFV",
-                                           plotOutput("ofv_plot", height = "550px")),
+                                           shinycssloaders::withSpinner(
+                                             plotOutput("ofv_plot", height = "550px"),
+                                             color = "#d73925")),
                                   tabPanel(title = "Parameters",
                                            flowLayout(
                                              selectInput("params_type", "Select parameters type", choices = c("THETA", "OMEGA", "SIGMA")),
@@ -211,11 +225,17 @@ observeEvent(input$show_run_details, {
                                                               checkboxInput("params_facetted", "Facetted", value = TRUE)
                                              )
                                            ),
-                                           plotOutput("parameters_plot", height = "550px")),
+                                           shinycssloaders::withSpinner(
+                                             plotOutput("parameters_plot", height = "550px"), color = "#d73925"
+                                           )),
                                   tabPanel(title = "Iterations",
-                                           dataTableOutput("iterations_table")),
+                                           shinycssloaders::withSpinner(
+                                             dataTableOutput("iterations_table"),
+                                             color = "#d73925")),
                                   tabPanel(title = "Control file",
-                                           verbatimTextOutput("control_file_code"))
+                                           shinycssloaders::withSpinner(
+                                             verbatimTextOutput("control_file_code"),
+                                             color = "#d73925"))
                                 )))
                         ),
                         shinyjs::hidden(div(id = "job_is_not_running", sprintf("Job %s is not running", r_number))),
@@ -529,10 +549,10 @@ output$control_file_code <- renderPrint({
   writeLines(run$control_stream$code)
 })
 
-outputOptions(output, "ofv_plot", suspendWhenHidden = FALSE)
-outputOptions(output, "parameters_plot", suspendWhenHidden = FALSE)
-outputOptions(output, "iterations_table", suspendWhenHidden = FALSE)
-outputOptions(output, "control_file_code", suspendWhenHidden = FALSE)
+# outputOptions(output, "ofv_plot", suspendWhenHidden = FALSE)
+# outputOptions(output, "parameters_plot", suspendWhenHidden = FALSE)
+# outputOptions(output, "iterations_table", suspendWhenHidden = FALSE)
+# outputOptions(output, "control_file_code", suspendWhenHidden = FALSE)
 
 outputOptions(output, "local_run_list", suspendWhenHidden = FALSE)
 outputOptions(output, "queued_list", suspendWhenHidden = FALSE)

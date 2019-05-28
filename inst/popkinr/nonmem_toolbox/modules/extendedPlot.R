@@ -36,9 +36,10 @@ extendedPlotUI <- function(id, title = "plot", exportable = TRUE, zoomable = TRU
                        downloadButton(ns("download_plot"), label = "Export plot"),
                        actionButton(ns("save_plot"), "Save in run files"),
                        downloadButton(ns("download_ggplot"), label = "Export ggplot2 object (*.rds)")))),
+
       div(id = ns("r_code_section"),
           h4("R code"),
-          shinyAce::aceEditor(ns("r_code"), mode = "r", height = "100px", readOnly = TRUE)))
+          shinyAce::aceEditor(ns("r_code"), mode = "r", height = "80px", readOnly = TRUE, wordWrap = TRUE)))
   }
 
   div(
@@ -157,6 +158,10 @@ extendedPlot <- function(input, output, session,
 
     # Create a `load_nm_run` call with the run path
     load_run_call <- call2(quote(load_nm_run), inner_run()$info$path)
+
+    if(identical(inner_run(), pmxploit::EXAMPLERUN)){
+      load_run_call <- quote(pmxploit::EXAMPLERUN)
+    }
 
     # Construct the full call:
     # load_nm_run %>% filter (if any) %>% group_by (if any) %>% pmxploit_call %>% theme_pmx())
