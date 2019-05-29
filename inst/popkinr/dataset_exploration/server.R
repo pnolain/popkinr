@@ -850,11 +850,11 @@ shinyServer(function(input, output){
 
   ##### valeurs réactives: le compteur et la table
   values<-reactiveValues(n_row=1,
-                         Enrich_Table=data_frame(START = 0,END = 1, STEP=0.5, CMT=1),
+                         Enrich_Table=dplyr::tibble(START = 0,END = 1, STEP=0.5, CMT=1),
                          rich_df=NULL,
                          NCA_results=NULL,
                          NCA_n_row=1,
-                         NCA_Intervals_Table=data.frame(start = 0, end = Inf),
+                         NCA_Intervals_Table=dplyr::tibble(start = 0, end = Inf),
                          NCA_output=NULL,
                          nca_joindata=NULL,
                          dataset_path = NULL,
@@ -1421,6 +1421,13 @@ shinyServer(function(input, output){
     }
   })
   observe({
+    if (input$Run_NCA==0) {
+      shinyjs::hide(id="NCAstat_download", anim=FALSE, animType ="slide")
+    }  else {
+      shinyjs::show(id="NCAstat_download", anim=FALSE, animType ="slide")
+    }
+  })
+  observe({
     if (input$dose.choice!="Other") {
       shinyjs::hide(id="NCA_dosenumber", anim=FALSE, animType ="slide")
     }  else {
@@ -1431,14 +1438,25 @@ shinyServer(function(input, output){
   ### Téléchargement de la table NCA en sortie:
   output$NCA_download <-  downloadHandler(
     filename = function() {
-      paste("NCA_parameters",".xlsx", sep="")
+      paste("NCA_parameters",".csv", sep="")
     },
     content = function(file) {
-        xlsx::write.xlsx(values$NCA_output, file, sheetName="NCA parameters",row.names=FALSE, col.names=TRUE,append=FALSE, showNA=TRUE)
-        xlsx::write.xlsx(values$NCA_stat_table, file, sheetName="Desc. Stat",row.names=FALSE, col.names=TRUE,append=TRUE, showNA=TRUE)
-      },contentType ="application/vnd.ms-excel"
+       readr::write_csv(req(values$NCA_output), file, na=".", col_names=TRUE,append=FALSE)
+        }
 
   )
+
+  output$NCAstat_download <-  downloadHandler(
+    filename = function() {
+      paste("Stat_on_NCA_parameters",".csv", sep="")
+    },
+    content = function(file) {
+
+      readr::write_csv(req(values$NCA_stat_table), file, na=".", col_names=TRUE,append=FALSE)
+    }
+
+  )
+
 
   #
   #   downloadHandler(
@@ -1523,6 +1541,16 @@ shinyServer(function(input, output){
     values$dataset_path  <- dataset_browser()$file
 
     removeModal()
+
+  })
+
+  observeEvent(input$sidebarmenu,{ req(input$sidebarmenu == "NCA_tab")
+    showModal(modalDialog(
+      title = div("Note :",style = "color: orange;"),
+      div("PMXplore can not manage NCA parameters calculation for datasets containing ADDL / II",style = "color: orange;"),
+      footer = NULL,
+      easyClose = T
+    ))
 
   })
 
