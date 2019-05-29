@@ -33,7 +33,7 @@ shinyUI(
     dashboardHeader(title = "PMxplore", titleWidth = 400),
 
     dashboardSidebar(
-      sidebarMenu(
+      sidebarMenu(id="sidebarmenu",
 
         menuItem("Home", tabName = "dashboard", icon = icon("home"), selected = TRUE),
 
@@ -298,6 +298,8 @@ shinyUI(
                   box(width=8,title=h3("New dataset preview:"),DT::dataTableOutput('richdata'))
                 )),
         tabItem(tabName = "NCA_tab",
+
+
                 fluidRow(
                   box(width=4,
                       uiOutput("NCA_cmt_dose_choice"),
@@ -355,9 +357,20 @@ shinyUI(
                                                  border-radius: 6px;
                                                  border-width: 3px")
                       ,br(),
-                      downloadButton("NCA_download", label="Download", class = "butt1",
+                      downloadButton("NCA_download", label="Download results", class = "butt1",
                                      style = "color: black;
                                                  background-color: #CCD1D1;
+                                                 position: relative;
+                                                 left: 3%;
+                                                 height: 35px;
+                                                 width: 150px;
+                                                 text-align:center;
+                                                 text-indent: -2px;
+                                                 border-radius: 6px;
+                                                 border-width: 3px"),
+                      downloadButton("NCAstat_download", label="Download Stats", class = "butt1",
+                                     style = "color: black;
+                                                 background-color: #86B2AC;
                                                  position: relative;
                                                  left: 3%;
                                                  height: 35px;

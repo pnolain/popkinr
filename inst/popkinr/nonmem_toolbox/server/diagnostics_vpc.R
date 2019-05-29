@@ -257,12 +257,12 @@ observe({
         xml_path <- str_c(app_temp_vpc_directory, "run", "vpc.xml", sep = "/")
 
         if(file.exists(xml_path)){
-          xml_file <- xml2::read_xml(xml_path)
+          xml_file <- read_xml(xml_path)
 
-          sim_info <- xml2::xml_find_all(xml_file, "//nm:simulation_information") %>% last
+          sim_info <- xml_find_all(xml_file, "//nm:simulation_information") %>% last
 
           if(length(sim_info) > 0){
-            err_message <- xml2::xml_text(sim_info)
+            err_message <- xml_text(sim_info)
           }
         }
 

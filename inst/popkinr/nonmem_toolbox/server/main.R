@@ -4,60 +4,61 @@ session$onSessionEnded(function() {
     unlink(app_temp_directory, recursive = TRUE)
   }
 
-  isolate({
-    if(nrow(rv$previous_runs) > 0){
-      runs_history <- rv$previous_runs
+  save_xml_data()
 
-      if(!is.null(rv$run)){
-        runs_history <- runs_history %>%
-          # add_row(date = lubridate::now(), path = rv$run$info$path) %>%
-          arrange(desc(date)) %>%
-          slice(1:20)
-      }
+  # stopApp()
+})
 
-      root_node <- xml_new_root("popkinr")
+save_xml_data <- function(){
+  r_hist <- read_previous_runs()
 
-      new_pmxploit_node <- root_node %>%
-        xml_add_child("pmxploit")
+  if(!is.null(r_hist) & nrow(r_hist) > 0){
+    runs_history <- r_hist %>%
+      filter(path != rv$run$info$path) %>%
+      add_row(date = lubridate::now(), path = rv$run$info$path) %>%
+      arrange(desc(date)) %>%
+      slice(1:20)
+  }
 
-      history_node <- new_pmxploit_node %>%
-        xml_add_child("history")
+  root_node <- xml_new_root("popkinr")
 
-      walk2(runs_history$date, runs_history$path,  function(date, path) {
-        history_node %>%
-          xml_add_child("run") %>%
-          xml_set_attrs(c(date = as.character(lubridate::as_datetime(date)), path = path))
-      })
+  new_pmxploit_node <- root_node %>%
+    xml_add_child("pmxploit")
 
-      if(file.exists(app_xml_path)){
-        doc <- read_xml(app_xml_path)
+  history_node <- new_pmxploit_node %>%
+    xml_add_child("history")
 
-        pmxploit_node <- doc %>% xml_find_first("/popkinr/pmxploit")
+  walk2(runs_history$date, runs_history$path,  function(date, path) {
+    history_node %>%
+      xml_add_child("run") %>%
+      xml_set_attrs(c(date = as.character(lubridate::as_datetime(date)), path = path))
+  })
 
-        if(!is.na(pmxploit_node)){
-          xml_replace(pmxploit_node, new_pmxploit_node)
+  if(file.exists(app_xml_path)){
+    doc <- read_xml(app_xml_path)
 
-          write_xml(doc, app_xml_path)
-        } else {
-          popkinr_node <-  doc %>% xml_find_first("//popkinr")
+    pmxploit_node <- doc %>% xml_find_first("/popkinr/pmxploit")
 
-          if(!is.na(popkinr_node)){
-            popkinr_node %>%
-              xml_add_child(new_pmxploit_node)
+    if(!is.na(pmxploit_node)){
+      xml_replace(pmxploit_node, new_pmxploit_node)
 
-            write_xml(doc, app_xml_path)
-          } else {
-            write_xml(root_node, app_xml_path)
-          }
-        }
+      write_xml(doc, app_xml_path)
+    } else {
+      popkinr_node <-  doc %>% xml_find_first("//popkinr")
+
+      if(!is.na(popkinr_node)){
+        popkinr_node %>%
+          xml_add_child(new_pmxploit_node)
+
+        write_xml(doc, app_xml_path)
       } else {
         write_xml(root_node, app_xml_path)
       }
     }
-  })
-
-  # stopApp()
-})
+  } else {
+    write_xml(root_node, app_xml_path)
+  }
+}
 
 
 
@@ -244,6 +245,10 @@ open_run <- function(run_path){
   } else {
     rv$run <- run_load$result$result
     rv$run_initial_metadata <- rv$run$model
+
+    save_xml_data()
+
+    rv$previous_runs <- read_previous_runs()
 
     # perform some run checks
     if(nrow(rv$run$model$covariates) == 0) {

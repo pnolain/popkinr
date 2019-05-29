@@ -26,16 +26,7 @@ nonmem_monitor <- function(type = "local",
                            nmcheck_call = NULL,
                            nonmem_parafile = NULL,
                            execution_dir = "pmxrun",
-                           results_subdir = "nmnqs", ...){
-
-  # if(!is.null(nm_exe_path))
-  #   Sys.setenv(NM_EXE_PATH = nm_exe_path)
-  #
-  # if(!is.null(nmcheck_exe_path))
-  #   Sys.setenv(NMCHECK_EXE_PATH = nmcheck_exe_path)
-  #
-  # if(!is.null(nonmem_parafile))
-  #   Sys.setenv(NM_PARAFILE = nonmem_parafile)
+                           results_subdir = "results", ...){
 
   if(!is.null(nonmem_exe))
     Sys.setenv(NM_EXE = nonmem_exe)
@@ -62,7 +53,6 @@ nonmem_monitor <- function(type = "local",
     app_dir <- system.file("popkinr/nonmem_local", package = "popkinr")
   } else if(type == "torque"){
     stop(simpleError("Torque version is not implemented yet."))
-    #app_dir <- system.file("popkinr/nonmem_torque", package = "popkinr")
   }
 
   runApp(appDir = app_dir, ...)
