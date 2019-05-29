@@ -56,22 +56,30 @@ initial_run_path <- NULL
 if(env_pmx_startup_path != "")
   initial_run_path <- env_pmx_startup_path
 
-if(file.exists(app_xml_path)){
-  doc <- read_xml(app_xml_path)
+read_previous_runs <- function(){
+  prev_runs <- NULL
 
-  run_nodes <- doc %>%
-    xml_find_all("/popkinr/pmxploit/history/run")
+  if(file.exists(app_xml_path)){
+    doc <- read_xml(app_xml_path)
 
-  if(length(run_nodes) > 0){
-    last_runs <- as_list(run_nodes) %>%
-      map(~ list(date = lubridate::ymd_hms(attr(., "date")), path = attr(., "path"))) %>%
-      bind_rows() %>%
-      arrange(date)
+    run_nodes <- doc %>%
+      xml_find_all("/popkinr/pmxploit/history/run")
 
-    startup_last_runs <- last_runs %>%
-      filter(file.exists(path))
+    if(length(run_nodes) > 0){
+      last_runs <- as_list(run_nodes) %>%
+        map(~ list(date = lubridate::ymd_hms(attr(., "date")), path = attr(., "path"))) %>%
+        bind_rows() %>%
+        arrange(date)
 
-    if(nrow(startup_last_runs) > 0)
-      user_initial_selection <- startup_last_runs %>% slice(n()) %>% .$path %>% dirname
+      prev_runs <- last_runs %>%
+        filter(file.exists(path))
+    }
   }
+
+  prev_runs
 }
+
+startup_last_runs <- read_previous_runs()
+
+if(!is.null(startup_last_runs) && nrow(startup_last_runs) > 0)
+  user_initial_selection <- startup_last_runs %>% slice(n()) %>% .$path %>% dirname
