@@ -850,14 +850,15 @@ shinyServer(function(input, output){
 
   ##### valeurs réactives: le compteur et la table
   values<-reactiveValues(n_row=1,
-                         Enrich_Table=data_frame(START = 0,END = 1, STEP=0.5, CMT=1),
+                         Enrich_Table=dplyr::tibble(START = 0,END = 1, STEP=0.5, CMT=1),
                          rich_df=NULL,
                          NCA_results=NULL,
                          NCA_n_row=1,
-                         NCA_Intervals_Table=data.frame(start = 0, end = Inf),
+                         NCA_Intervals_Table=dplyr::tibble(start = 0, end = Inf),
                          NCA_output=NULL,
                          nca_joindata=NULL,
-                         dataset_path = NULL
+                         dataset_path = NULL,
+                         nca_stat_table = NULL
   )
 
 
@@ -926,7 +927,8 @@ shinyServer(function(input, output){
       fill_columns <-if (input$ColOption==T){input$fillcol} else {df %>% names()%>% setdiff(c("AMT", "DV", "RATE", "SS", "II", "ADDL"))}
     })
     withProgress({
-      values$rich_df<- df %>% enrich_dataset(periods=pr , columns_to_fill = fill_columns)
+      values$rich_df<- if (isTRUE(exists("df$CMT"))){df %>% enrich_dataset(periods=pr , columns_to_fill = fill_columns)}
+                        else {df %>% mutate(CMT=1 ) %>% enrich_dataset(periods=pr , columns_to_fill = fill_columns)}
       setProgress(value = 1, message = "Done !")
     }, value = 0.5, message = "Creating new dataset...")
 
@@ -952,11 +954,11 @@ shinyServer(function(input, output){
   ### Téléchargement de la table en sortie:
   output$download1 <-  downloadHandler(
     filename = function() {
-      paste("Enriched","dataset", sep="")
+      paste("Enriched","dataset.csv", sep="")
     },
     content = function(file) {
 
-      write_csv(req(values$rich_df), file, na=".",
+      readr::write_csv(req(values$rich_df), file, na=".",
                 col_names=TRUE,append=FALSE)
     }
 
@@ -1255,6 +1257,37 @@ shinyServer(function(input, output){
 
 
 
+  ###Stats desc sur les paramètres NCA:
+  observeEvent(input$Run_NCA,{
+
+
+    withProgress({
+      values$NCA_stat_table <- values$NCA_output  %>% select(-start, -end, -ID) %>% dplyr::summarise_all(funs(n=length, Mean=mean(.,na.rm=T), Median=median(.,na.rm=T),
+                                                                                                              Min=min(.,na.rm=T),Max=max(.,na.rm=T),SD=sd(.,na.rm=T))) %>%
+                               gather(stat,val) %>% separate(stat, into=c("var", "stat"), sep="_") %>% spread(var,val) %>% mutate_if(is.numeric,round,digits=3)
+      target = c("n","Mean","Median","Min","Max","SD")
+      values$NCA_stat_table <-values$NCA_stat_table[match(target,values$NCA_stat_table$stat),]
+
+
+      setProgress(value = 1, message = "Done !")
+    }, value = 0.5, message = "Calculating descriptive statistics...")
+
+  })
+
+  # sortie table stat NCA:
+  output$NCA_stat_data <- DT::renderDataTable({
+
+
+    datatable(values$NCA_stat_table, rownames=F, options=list(paging=F, ordering= F, scrollX=F, filter=F,initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().header()).css({'background-color': '#86B2AC', 'color': '#000'});",
+      "}"))) %>% formatStyle('stat',  color = 'black', backgroundColor = '#86B2AC', fontWeight = 'bold')
+
+  }
+  )
+
+
+
   ###Table sortie des doses et concs :
   observeEvent(input$Run_NCA,{
 
@@ -1308,7 +1341,7 @@ shinyServer(function(input, output){
   output$NCAdata <- DT::renderDataTable({
 
 
-    values$NCA_output
+    req(values$NCA_output) %>% mutate_if(is.numeric,round,digits=3)
 
   },
   options = list(pageLength = 20,lengthMenu=c(20,40,100), dom = 'lftip', paging=TRUE, scrollX = TRUE,  filter='top',
@@ -1388,6 +1421,13 @@ shinyServer(function(input, output){
     }
   })
   observe({
+    if (input$Run_NCA==0) {
+      shinyjs::hide(id="NCAstat_download", anim=FALSE, animType ="slide")
+    }  else {
+      shinyjs::show(id="NCAstat_download", anim=FALSE, animType ="slide")
+    }
+  })
+  observe({
     if (input$dose.choice!="Other") {
       shinyjs::hide(id="NCA_dosenumber", anim=FALSE, animType ="slide")
     }  else {
@@ -1398,15 +1438,38 @@ shinyServer(function(input, output){
   ### Téléchargement de la table NCA en sortie:
   output$NCA_download <-  downloadHandler(
     filename = function() {
-      paste("NCA_parameters_for", sep="")
+      paste("NCA_parameters",".csv", sep="")
+    },
+    content = function(file) {
+       readr::write_csv(req(values$NCA_output), file, na=".", col_names=TRUE,append=FALSE)
+        }
+
+  )
+
+  output$NCAstat_download <-  downloadHandler(
+    filename = function() {
+      paste("Stat_on_NCA_parameters",".csv", sep="")
     },
     content = function(file) {
 
-      write_csv(req(values$NCA_output), file,
-                col_names=TRUE,append=FALSE)
+      readr::write_csv(req(values$NCA_stat_table), file, na=".", col_names=TRUE,append=FALSE)
     }
 
   )
+
+
+  #
+  #   downloadHandler(
+  #   filename = function() {
+  #     paste("NCA_parameters.csv", sep="")
+  #   },
+  #   content = function(file) {
+  #
+  #     readr::write_csv(req(values$NCA_output), file,
+  #               col_names=TRUE,append=FALSE)
+  #   }
+  #
+  # )
 
 
 
@@ -1478,6 +1541,16 @@ shinyServer(function(input, output){
     values$dataset_path  <- dataset_browser()$file
 
     removeModal()
+
+  })
+
+  observeEvent(input$sidebarmenu,{ req(input$sidebarmenu == "NCA_tab")
+    showModal(modalDialog(
+      title = div("Note :",style = "color: orange;"),
+      div("PMXplore can not manage NCA parameters calculation for datasets containing ADDL / II",style = "color: orange;"),
+      footer = NULL,
+      easyClose = T
+    ))
 
   })
 
