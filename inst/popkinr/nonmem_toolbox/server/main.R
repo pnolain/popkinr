@@ -11,14 +11,15 @@ session$onSessionEnded(function() {
 
 save_xml_data <- function(){
   r_hist <- read_previous_runs()
+  runs_history <- NULL
 
-  if(!is.null(r_hist) && nrow(r_hist) > 0){
+  # if(!is.null(r_hist) && nrow(r_hist) > 0){
     runs_history <- r_hist %>%
       filter(path != rv$run$info$path) %>%
       add_row(date = lubridate::now(), path = rv$run$info$path) %>%
       arrange(desc(date)) %>%
       slice(1:20)
-  }
+  # }
 
   root_node <- xml_new_root("popkinr")
 
@@ -28,11 +29,13 @@ save_xml_data <- function(){
   history_node <- new_pmxploit_node %>%
     xml_add_child("history")
 
-  walk2(runs_history$date, runs_history$path,  function(date, path) {
-    history_node %>%
-      xml_add_child("run") %>%
-      xml_set_attrs(c(date = as.character(lubridate::as_datetime(date)), path = path))
-  })
+  if(!is.null(runs_history)){
+    walk2(runs_history$date, runs_history$path,  function(date, path) {
+      history_node %>%
+        xml_add_child("run") %>%
+        xml_set_attrs(c(date = as.character(lubridate::as_datetime(date)), path = path))
+    })
+  }
 
   if(file.exists(app_xml_path)){
     doc <- read_xml(app_xml_path)
