@@ -12,7 +12,7 @@ session$onSessionEnded(function() {
 save_xml_data <- function(){
   r_hist <- read_previous_runs()
 
-  if(!is.null(r_hist) & nrow(r_hist) > 0){
+  if(!is.null(r_hist) && nrow(r_hist) > 0){
     runs_history <- r_hist %>%
       filter(path != rv$run$info$path) %>%
       add_row(date = lubridate::now(), path = rv$run$info$path) %>%
