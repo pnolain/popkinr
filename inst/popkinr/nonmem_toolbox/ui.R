@@ -611,7 +611,7 @@ dashboardPage(
                             "4 individuals" = 4,
                             "16 individuals" = 16
                           ),
-                          selected = 16
+                          selected = 1
                         )
                       ),
                       column(6,

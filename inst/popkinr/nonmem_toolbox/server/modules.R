@@ -33,7 +33,7 @@ run_browser <- callModule(popkinr::serverBrowser, "run_browser",
                           initial_selection = user_initial_selection,
                           file_extensions = c("tar.gz", "zip"),
                           folder_shortcuts = reactive({
-                            if(nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
+                            if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
                           }),
                           formatting_function = run_browser_formatting)
 
@@ -42,7 +42,7 @@ metadata_browser <- callModule(popkinr::serverBrowser, "metadata_browser",
                                initial_selection = user_initial_selection,
                                file_extensions = c("tar.gz", "zip"),
                                folder_shortcuts = reactive({
-                                 if(nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
+                                 if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
                                }),
                                formatting_function = run_browser_formatting)
 
@@ -51,7 +51,7 @@ comparison_browser <- callModule(popkinr::serverBrowser, "comparison_browser",
                                  initial_selection = user_initial_selection,
                                  file_extensions = c("tar.gz", "zip"),
                                  folder_shortcuts = reactive({
-                                   if(nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
+                                   if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
                                  }),
                                  formatting_function = run_browser_formatting)
 
