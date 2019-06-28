@@ -57,7 +57,7 @@ if(env_pmx_startup_path != "")
   initial_run_path <- env_pmx_startup_path
 
 read_previous_runs <- function(){
-  prev_runs <- NULL
+  prev_runs <- tibble(date = as.POSIXct(character()), path = character())
 
   if(file.exists(app_xml_path)){
     doc <- read_xml(app_xml_path)
