@@ -273,10 +273,12 @@ serverBrowser <- function(input, output, session, root_directory,
 
     folders_paths <- folders[dir.exists(folders)] %>% normalizePath() %>% unique()
 
+    selected_dir <- isolate(rv$folder_selection)
+
     selectInput(session$ns("folder_shortcuts"),
                 "Jump to folder",
                 choices = c("/", sort(folders_paths)),
-                selected = isolate(rv$folder_selection),
+                selected = ifelse(dir.exists(selected_dir), selected_dir, initial_selection),
                 width = "100%")
   })
 
