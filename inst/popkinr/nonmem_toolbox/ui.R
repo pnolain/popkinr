@@ -1290,21 +1290,21 @@ dashboardPage(
                               column(3,
                                      h4("Formulas"),
                                      tags$ul(
-                                       tags$li("Maximal Error:",
+                                       tags$li("Maximal Error",
                                                withMathJax('$$ME=max(|pred_i-obs_i|)$$')),
                                        tags$li(
-                                         "Absolute Average Fold Error:",
+                                         "Absolute Average Fold Error",
                                          withMathJax(
                                            '$$AAFE=10^{\\dfrac{1}{N}{\\sum_{i=1}^N{|log(\\dfrac{pred_i}{obs_i}) |}}}$$'
                                          )
                                        ),
-                                       tags$li("MPE (absolute)",
+                                       tags$li("Mean Prediction Error",
                                                withMathJax('$$MPE=\\dfrac{1}{N}{\\sum_{i=1}^N{pred_i-obs_i}}$$')),
-                                       tags$li("MPE (relative)",
-                                               withMathJax('$$MPE(\\%)=\\dfrac{1}{N}{\\sum_{i=1}^N{\\dfrac{pred_i-obs_i}{obs_i}}}$$')),
-                                       tags$li("RMSE (absolute)",
+                                       tags$li("Mean Prediction Error (relative to the mean)",
+                                               withMathJax('$$MPE(\\%)=\\dfrac{MPE}{\\overline{obs}}$$')),
+                                       tags$li("Root Mean Square Error",
                                                withMathJax('$$RMSE=\\sqrt{\\dfrac{\\sum_{i=1}^N{(pred_i-obs_i)^2}}{N}}$$')),
-                                       tags$li("RMSE (relative)",
+                                       tags$li("RMSE (relative to the mean)",
                                                withMathJax('$$RMSE(\\%)=\\dfrac{RMSE}{\\overline{obs}}$$'))
                                      )))),
             tabPanel(title = "Student's t-Tests",
