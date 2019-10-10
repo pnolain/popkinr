@@ -1301,7 +1301,7 @@ dashboardPage(
                                        tags$li("MPE (absolute)",
                                                withMathJax('$$MPE=\\dfrac{1}{N}{\\sum_{i=1}^N{pred_i-obs_i}}$$')),
                                        tags$li("MPE (relative)",
-                                               withMathJax('$$MPE(\\%)=\\dfrac{1}{N}{\\sum_{i=1}^N{\\dfrac{pred_i-obs_i}{obs_i}}}$$')),
+                                               withMathJax('$$MPE(\\%)=\\dfrac{1}{N}{\\sum_{i=1}^N{\\dfrac{pred_i-obs_i}{\\overline{obs}}}}$$')),
                                        tags$li("RMSE (absolute)",
                                                withMathJax('$$RMSE=\\sqrt{\\dfrac{\\sum_{i=1}^N{(pred_i-obs_i)^2}}{N}}$$')),
                                        tags$li("RMSE (relative)",
