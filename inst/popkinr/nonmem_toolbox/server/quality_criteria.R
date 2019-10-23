@@ -146,7 +146,7 @@ output$qc_standard <- renderDataTable({
                                                                                      rv$run$model$covariates$name,
                                                                                      warn_missing = FALSE)))
 
-  qc_s <- qc %>% select(one_of(qc_cols)) %>% unnest() %>% rename("Observations" = n_observations,
+  qc_s <- qc %>% select(one_of(qc_cols)) %>% unnest(standard) %>% rename("Observations" = n_observations,
                                                                  "Maximal Error" = max_err,
                                                                  "Absolute Average Fold Error" = aafe)
 
@@ -161,7 +161,7 @@ output$qc_bias <- renderDataTable({
                                                                                  rv$run$model$covariates$name,
                                                                                  warn_missing = FALSE)))
 
-  qc_b <- qc %>% select(one_of(qc_cols)) %>% unnest()
+  qc_b <- qc %>% select(one_of(qc_cols)) %>% unnest(bias)
 
   ci <- (1 - as.numeric(input$qc_alpha)) * 100
 
@@ -182,7 +182,7 @@ output$qc_precision <- renderDataTable({
                                                                                       rv$run$model$covariates$name,
                                                                                       warn_missing = FALSE)))
 
-  qc_p <- qc %>% select(one_of(qc_cols)) %>% unnest()
+  qc_p <- qc %>% select(one_of(qc_cols)) %>% unnest(precision)
 
   ci <- (1 - as.numeric(input$qc_alpha)) * 100
 
@@ -205,7 +205,7 @@ output$qc_t_test_obs <- renderDataTable({
 
   qc_t <- qc %>% select(one_of(qc_cols))  %>%
     mutate(t_test_obs = map(t_test_obs, tidy)) %>%
-    unnest() %>%
+    unnest(t_test_obs) %>%
     select(-method, -alternative)
 
   df <- qc_t
@@ -225,9 +225,9 @@ output$qc_t_test_res <- renderDataTable({
   qc_t <- qc %>%
     select(one_of(qc_cols))  %>%
     filter(!map_lgl(t_test_res, is.null)) %>%
-    unnest() %>%
+    unnest(t_test_res) %>%
     mutate(t.test = map(t.test, tidy)) %>%
-    unnest() %>%
+    unnest(t.test) %>%
     select(-method, -alternative)
 
   df <- qc_t
@@ -247,7 +247,7 @@ output$qc_corr_test <- renderDataTable({
   qc_c <- qc %>%
     select(one_of(qc_cols)) %>%
     mutate(correlation_test = map(correlation_test, tidy)) %>%
-    unnest() %>%
+    unnest(correlation_test) %>%
     select(-method, -alternative)
 
   df <- qc_c
@@ -272,7 +272,7 @@ run_qc_lin_reg <- reactive({
 output$qc_lin_reg <- renderDataTable({
   qc_l <- req(run_qc_lin_reg()) %>%
     mutate(linear_regression = map(linear_regression, tidy)) %>%
-    unnest()
+    unnest(linear_regression)
 
   df <- qc_l %>%
     mutate(term = plyr::revalue(term, c("observations" = "slope")))

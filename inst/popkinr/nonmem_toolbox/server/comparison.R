@@ -210,7 +210,7 @@ output$comparison_estimation_method <- renderUI({
 
   all_runs <- req(comparison_results())
 
-  e_methods <- all_runs %>% select(ESTIMATION) %>% unnest() %>% unnest(SUMMARY) %>% pull(METHOD) %>% unique()
+  e_methods <- all_runs %>% select(ESTIMATION) %>% unnest(ESTIMATION) %>% unnest(SUMMARY) %>% pull(METHOD) %>% unique()
 
   e_sel <- isolate(if(!is.null(rv_comp$filters_method)) intersect(e_methods, rv_comp$filters_method) else e_methods)
 
@@ -222,7 +222,7 @@ output$comparison_estimation_status <- renderUI({
 
   all_runs <- req(comparison_results())
 
-  e_status <- all_runs %>% select(ESTIMATION) %>% unnest() %>% unnest(SUMMARY) %>% pull(STATUS) %>% unique()
+  e_status <- all_runs %>% select(ESTIMATION) %>% unnest(ESTIMATION) %>% unnest(SUMMARY) %>% pull(STATUS) %>% unique()
 
   e_sel <- isolate(if(!is.null(rv_comp$filters_status)) intersect(e_status, rv_comp$filters_status) else e_status)
 
@@ -299,13 +299,10 @@ comparison_summary_table <- reactive({
     filter(STATUS != "Failed")
 
   if(nrow(df_ok) > 0){
+    browser()
     df_ok <- df_ok %>%
-      select(INDEX_RUN, INDEX_EST, RUN_ID, one_of(cp_details)) %>%
-      # mutate_if(is.list, function(x) {
-      #   if(is.null(x[[1]])) return(list(tibble(NA)))
-      #   x
-      # }) %>%
-      unnest()
+      select(INDEX_RUN, INDEX_EST, RUN_ID, !!cp_details) %>%
+      unnest(!!cp_details)
   }
 
 
@@ -373,7 +370,7 @@ run_comparison_table <- reactive({
 
   statuses <- selected_estimations() %>%
     select(INDEX_RUN, INDEX_EST, RUN_ID, SUMMARY) %>%
-    unnest() %>%
+    unnest(SUMMARY) %>%
     select(INDEX_RUN, INDEX_EST, RUN_ID, STATUS) %>%
     mutate(RUN_EST = str_c(INDEX_RUN, ".", INDEX_EST)) %>%
     mutate(COLOR = plyr::mapvalues(
@@ -434,8 +431,8 @@ comparison_statistics <- reactive({
   cp_details <- intersect(cp_sel, colnames(cp_table))
 
   df <- cp_table %>%
-    select(one_of(cp_details)) %>%
-    unnest() %>%
+    select(!!cp_details) %>%
+    unnest(!!cp_details) %>%
     gather(parameter, value)
 
   if(!input$comparison_stats_table_rse){
@@ -490,8 +487,8 @@ run_comparison_param_plot <- reactive({
   req(nrow(cp_table) > 0)
 
   df <- cp_table %>%
-    select(RUN_ID, one_of(cp_type)) %>%
-    unnest() %>%
+    select(RUN_ID, !!cp_details) %>%
+    unnest(!!cp_details) %>%
     select(RUN_ID, one_of(cp_selection)) %>%
     gather(param, value, -RUN_ID)
 
