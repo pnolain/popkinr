@@ -38,7 +38,7 @@ local_nonmem_cpu_usage <- reactive({
   tibble(PID = pids) %>%
     mutate(usage = map(PID, get_process_usage)) %>%
     filter(!map_lgl(usage, is.null)) %>%
-    unnest()
+    unnest(usage)
 })
 
 local_nonmem_jobs <- reactive({
@@ -321,7 +321,7 @@ output$iterations_table <- renderDataTable({
   req(nrow(data) > 0)
 
   estimation <- data %>%
-    unnest() %>%
+    unnest(iterations) %>%
     rename(estimation_number = number) %>%
     select(-goal_function, -problem, -subproblem, -superproblem1, -iteration1, -superproblem2, -iteration2)
 

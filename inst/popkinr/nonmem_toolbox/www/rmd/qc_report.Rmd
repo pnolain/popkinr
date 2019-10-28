@@ -66,7 +66,7 @@ if(has_filters)
 ```{r}
 qc_cols <- intersect(colnames(qc), c("n_observations", "standard", group_cols))
 
-qc_s <- qc %>% select(one_of(qc_cols)) %>% unnest() %>% rename("Maximal Error" = max_err,
+qc_s <- qc %>% select(one_of(qc_cols)) %>% unnest(standard) %>% rename("Maximal Error" = max_err,
                                                                "Absolute Average Fold Error" = aafe)
 
 knitr::kable(qc_s, align = "c")
@@ -76,7 +76,7 @@ knitr::kable(qc_s, align = "c")
 ```{r}
 qc_cols <- intersect(colnames(qc), c("n_observations", "bias", group_cols))
 
-qc_b <- qc %>% select(one_of(qc_cols)) %>% unnest()
+qc_b <- qc %>% select(one_of(qc_cols)) %>% unnest(bias)
 
 ci <- (1 - as.numeric(params$alpha)) * 100
 
@@ -93,7 +93,7 @@ knitr::kable(qc_b, align = "c")
 ```{r}
 qc_cols <- intersect(colnames(qc), c("n_observations", "precision", group_cols))
 
-qc_p <- qc %>% select(one_of(qc_cols)) %>% unnest()
+qc_p <- qc %>% select(one_of(qc_cols)) %>% unnest(precision)
 
 ci <- (1 - as.numeric(params$alpha)) * 100
 
@@ -115,7 +115,7 @@ qc_cols <- intersect(colnames(qc), c("n_observations", "t_test_obs", group_cols)
 qc_t_o <- qc %>% 
   select(one_of(qc_cols))  %>%
   mutate(t_test_obs = map(t_test_obs, broom::tidy)) %>%
-  unnest() %>%
+  unnest(t_test_obs) %>%
   select(-method, -alternative)
 
 knitr::kable(qc_t_o)
@@ -129,9 +129,9 @@ qc_cols <- intersect(colnames(qc), c("n_observations", "t_test_res", group_cols)
 qc_t_r <-qc %>%
   select(one_of(qc_cols)) %>% 
   filter(!map_lgl(t_test_res, is.null))%>%
-  unnest() %>%
+  unnest(t_test_res) %>%
   mutate(t.test = map(t.test, broom::tidy)) %>%
-  unnest() %>%
+  unnest(t.test) %>%
   select(-method, -alternative)
 
 knitr::kable(qc_t_r)
@@ -145,7 +145,7 @@ qc_cols <- intersect(colnames(qc), c("n_observations", "correlation_test", group
 qc_c <- qc %>%
   select(one_of(qc_cols)) %>%
   mutate(correlation_test = map(correlation_test, broom::tidy)) %>%
-  unnest() %>%
+  unnest(correlation_test) %>%
   select(-method, -alternative)
 
 
@@ -160,7 +160,7 @@ qc_cols <- intersect(colnames(qc), c("n_observations", "linear_regression", grou
 qc_l <- qc %>%
   select(one_of(qc_cols)) %>% 
   mutate(linear_regression = map(linear_regression, tidy)) %>%
-  unnest() %>%
+  unnest(linear_regression) %>%
   mutate(term = plyr::revalue(term, c("observations" = "slope")))
 
 knitr::kable(qc_l, align = "c")

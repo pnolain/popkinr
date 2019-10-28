@@ -307,7 +307,7 @@ observe({
       sim_df <- simtab %>%
         nest(-REP, .key = "sim") %>%
         mutate(obs = list(temp_obs_df)) %>%
-        unnest() %>%
+        unnest(obs) %>%
         select(REP, everything())
 
       rv_vpc$results <- list(n_simulations = rv_vpc$n_simulations,
