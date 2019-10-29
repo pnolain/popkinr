@@ -299,7 +299,6 @@ comparison_summary_table <- reactive({
     filter(STATUS != "Failed")
 
   if(nrow(df_ok) > 0){
-    browser()
     df_ok <- df_ok %>%
       select(INDEX_RUN, INDEX_EST, RUN_ID, !!cp_details) %>%
       unnest(!!cp_details)
