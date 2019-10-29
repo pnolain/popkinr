@@ -178,7 +178,7 @@ estimation_results <- reactive({
   run_indexes <- cp_res$INDEX_RUN
 
   est_res <- cp_res %>%
-    unnest(ESTIMATION, .drop = FALSE) %>%
+    unnest(ESTIMATION) %>%
     mutate(STATUS = map_chr(SUMMARY, ~.$STATUS)) %>%
     group_by(INDEX_RUN) %>%
     mutate(INDEX_EST = row_number()) %>%
