@@ -275,10 +275,13 @@ serverBrowser <- function(input, output, session, root_directory,
 
     selected_dir <- isolate(rv$folder_selection)
 
+    if(is.null(selected_dir) || !dir.exists(selected_dir))
+      selected_dir <- initial_selection
+
     selectInput(session$ns("folder_shortcuts"),
                 "Jump to folder",
                 choices = c("/", sort(folders_paths)),
-                selected = ifelse(dir.exists(selected_dir), selected_dir, initial_selection),
+                selected = selected_dir,
                 width = "100%")
   })
 
