@@ -486,9 +486,9 @@ run_comparison_param_plot <- reactive({
   req(nrow(cp_table) > 0)
 
   df <- cp_table %>%
-    select(RUN_ID, !!cp_details) %>%
-    unnest(!!cp_details) %>%
-    select(RUN_ID, one_of(cp_selection)) %>%
+    select(RUN_ID, !!cp_type) %>%
+    unnest(!!cp_type) %>%
+    select(RUN_ID, !!cp_selection) %>%
     gather(param, value, -RUN_ID)
 
   list_elem <- switch(cp_type,
