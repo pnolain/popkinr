@@ -301,7 +301,7 @@ comparison_summary_table <- reactive({
   if(nrow(df_ok) > 0){
     df_ok <- df_ok %>%
       select(INDEX_RUN, INDEX_EST, RUN_ID, !!cp_details) %>%
-      unnest(!!cp_details)
+      unnest(!!cp_details, names_repair = tidyr_legacy)
   }
 
 
@@ -431,7 +431,7 @@ comparison_statistics <- reactive({
 
   df <- cp_table %>%
     select(!!cp_details) %>%
-    unnest(!!cp_details) %>%
+    unnest(!!cp_details, names_repair = tidyr_legacy) %>%
     gather(parameter, value)
 
   if(!input$comparison_stats_table_rse){
