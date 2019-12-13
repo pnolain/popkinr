@@ -363,8 +363,8 @@ run_vpcdb <- reactive({
     strat_cols <- NULL
   }
 
-  sim_df <- vpc_data$sim %>% filter(CMT == vpc_cmt) %>% filter(UQS(vpc_filters))
-  obs_df <- vpc_data$obs %>% filter(CMT == vpc_cmt) %>% filter(UQS(vpc_filters))
+  sim_df <- vpc_data$sim %>% filter(CMT == vpc_cmt) %>% filter(!!!(vpc_filters))
+  obs_df <- vpc_data$obs %>% filter(CMT == vpc_cmt) %>% filter(!!!(vpc_filters))
 
   if(length(strat_cols) > 0){
     lvls <- rv$run$model$categorical_covariates_levels[strat_cols]

@@ -408,7 +408,7 @@ filtered_run <- reactive({
   run <- req(rv$run)
 
   run %>%
-    filter(UQS(rv$app_filters))
+    filter(!!!(rv$app_filters))
 })
 
 filtered_run_show_mdv <- reactive({
@@ -417,7 +417,7 @@ filtered_run_show_mdv <- reactive({
   no_mdv_filters <- discard(rv$app_filters, ~ all.equal(., quo(MDV == 0)) == TRUE)
 
   run %>%
-    filter(UQS(no_mdv_filters))
+    filter(!!!(no_mdv_filters))
 })
 
 filtered_run_reduced_baseline <- reactive({

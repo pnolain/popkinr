@@ -445,7 +445,7 @@ run_dv_vs_pred_plot <- reactive({
   grps <- map(input$diagnostic_split_by, as.symbol)
 
   filtered_run() %>%
-    group_by(UQS(grps)) %>%
+    group_by(!!!(grps)) %>%
     plot_dv_vs_predictions(compartment = selected_cmt, dv = "DV",
                            predictions = req(input$dv_vs_pred_type),
                            log_dv = input$diag_log_dv,
@@ -486,7 +486,7 @@ run_spaghetti_plot <- reactive({
   grps <- map(input$diagnostic_split_by, as.symbol)
 
   filtered_run_show_mdv() %>%
-    group_by(UQS(grps)) %>%
+    group_by(!!!(grps)) %>%
     plot_observed_profiles(compartment = selected_cmt,
                            ids = ids,
                            idv = req(input$spaghetti_idv),
@@ -532,7 +532,7 @@ run_residuals_plot <- reactive({
   })
 
 filtered_run() %>%
-    group_by(UQS(grps)) %>%
+    group_by(!!!(grps)) %>%
     plot_residuals(compartment = selected_cmt,
                    idv = req(input$res_x_type), residuals = req(input$res_y_type),
                    absolute_residuals = abs_res,

@@ -109,7 +109,7 @@ extendedPlot <- function(input, output, session,
         run_filters <- run_filters %>% map(~as.list(.)[[2]])
 
         # Create a filter call
-        filter_call <- call2(quote(filter), UQS(run_filters))
+        filter_call <- call2(quote(filter), !!!(run_filters))
       }
     }
 
@@ -122,7 +122,7 @@ extendedPlot <- function(input, output, session,
       grps <- env_get(plot_fn_envir, as.character(call_args(call_args(group_by_chain[[1]])[[1]])[[1]]))
 
       if(length(grps) > 0){
-        group_by_call <- call2(quote(group_by), UQS(syms(grps)))
+        group_by_call <- call2(quote(group_by), !!!(syms(grps)))
       }
     }
 
@@ -138,11 +138,11 @@ extendedPlot <- function(input, output, session,
 
     edit_call <- function(cc, ...){
       args <- dots_list(...)
-      call_modify(cc, UQS(args))
+      call_modify(cc, !!!(args))
     }
 
     # Edit the call to integrate de arguments values
-    # pmxploit_call <- edit_call(pmxploit_chain, UQS(args_values))
+    # pmxploit_call <- edit_call(pmxploit_chain, !!!(args_values))
 
     # NEW: Remove default arguments that are not changed
     # browser()
@@ -154,7 +154,7 @@ extendedPlot <- function(input, output, session,
     })
 
     args_values <- args_values[!args_to_skip]
-    pmxploit_call <- call2(first(pmxploit_chain), UQS(args_values))
+    pmxploit_call <- call2(first(pmxploit_chain), !!!(args_values))
 
     # Create a `load_nm_run` call with the run path
     load_run_call <- call2(quote(load_nm_run), inner_run()$info$path)
@@ -169,7 +169,11 @@ extendedPlot <- function(input, output, session,
     txt <- map_chr(calls, ~ str_c(deparse(., width.cutoff = 150L), collapse = "\n"))
     full_text <- str_c(txt, collapse = " %>%\n\t")
 
-    shinyAce::updateAceEditor(session, session$ns("r_code"), str_c(full_text, "+\n\ttheme_pmx()"))
+    print(writeLines(str_c(full_text, "+\n\ttheme_pmx()")))
+
+    shinyAce::updateAceEditor(session,
+                              editorId = "r_code",
+                              value = str_c(full_text, "+\n\ttheme_pmx()"))
   }
 
 
@@ -451,7 +455,7 @@ extendedPlot <- function(input, output, session,
   #     req(is.data.frame(my_plot$data))
   #
   #    n_facets <- my_plot$data %>%
-  #       group_by(UQS(facet_cols)) %>%
+  #       group_by(!!!(facet_cols)) %>%
   #       summarize() %>%
   #       nrow()
   #
