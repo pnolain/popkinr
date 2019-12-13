@@ -136,7 +136,9 @@ extendedDT_with_code <- function(input, output, session, reactive_table, filenam
     txt <- map_chr(calls, ~ str_c(deparse(., width.cutoff = 150L), collapse = "\n"))
     full_text <- str_c(txt, collapse = " %>%\n\t")
 
-    shinyAce::updateAceEditor(session, session$ns("r_code"), full_text)
+    shinyAce::updateAceEditor(session,
+                              editorId = "r_code",
+                              value = full_text)
   }
 
 
