@@ -86,7 +86,8 @@ extendedDT_with_code <- function(input, output, session, reactive_table, filenam
 
     if(length(group_by_chain) == 1L){
       # Extract current grouping columns
-      grps <- env_get(table_fn_envir, as.character(call_args(call_args(group_by_chain[[1]])[[1]])[[1]]))
+      #grps <- env_get(table_fn_envir, as.character(call_args(call_args(group_by_chain[[1]])[[1]])[[1]]))
+      grps <- eval(group_by_chain[[1]][[-1]][[-1]][[-1]][[-1]], table_fn_envir)
 
       if(length(grps) > 0){
         group_by_call <- call2(quote(group_by), !!!(syms(grps)))
