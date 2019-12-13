@@ -5,7 +5,7 @@ observeEvent(input$browse_evaluation_run, {
     title = "Select a run folder or archive",
     size = "l",
     popkinr::serverBrowserUI("evaluation_run_browser"),
-    div(tags$em("* Legend: Bold: directories containing *.tar.gz or *.zip archive files; Red: directories containing NONMEM run data")),
+    div(tags$em("* Legend: Bold: directories containing *.tar.gz, *.tgz or *.zip archive files; Red: directories containing NONMEM run data")),
     footer = list(modalButton("Close"),
                   actionButton("load_evaluation_run", "Load selection")),
     easyClose = TRUE)

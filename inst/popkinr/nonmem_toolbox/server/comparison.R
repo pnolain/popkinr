@@ -699,7 +699,7 @@ start_comparison <- function(folder = FALSE){
     parent_folder <- req(comparison_browser()$folder)
 
     # archives children
-    archives_to_load <- dir(parent_folder, pattern = "(\\.tar\\.gz|\\.zip)$", full.names = TRUE, recursive = TRUE) %>%
+    archives_to_load <- dir(parent_folder, pattern = "(\\.tar\\.gz|\\.zip|\\.tgz)$", full.names = TRUE, recursive = TRUE) %>%
       normalizePath()
 
     # folders children

@@ -29,6 +29,8 @@ vignettes/*.pdf
 .Rproj.user
 
 # custom
-# all *.tar.gz
+# all archives
 *.tar.gz
+*.tgz
+*.zip
 misc/

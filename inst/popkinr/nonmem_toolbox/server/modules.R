@@ -22,7 +22,7 @@ run_browser_formatting <- function(id, text){
   is_nm_run <- is_nm_run_folder(id)
   if(is_nm_run) return(sprintf("<span style='color:red;'>%s</span>", text))
 
-  has_archives <- (length(list.files(id, pattern = "(\\.tar\\.gz|\\.zip)$", ignore.case = TRUE)) > 0)
+  has_archives <- (length(list.files(id, pattern = "(\\.tar\\.gz|\\.zip|\\.tgz)$", ignore.case = TRUE)) > 0)
   if(has_archives) return(sprintf("<strong>%s</strong>", text))
 
   text
@@ -31,7 +31,7 @@ run_browser_formatting <- function(id, text){
 run_browser <- callModule(popkinr::serverBrowser, "run_browser",
                           root_directory = browsing_root,
                           initial_selection = user_initial_selection,
-                          file_extensions = c("tar.gz", "zip"),
+                          file_extensions = c("tar.gz", "tgz", "zip"),
                           folder_shortcuts = reactive({
                             if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
                           }),
@@ -40,7 +40,7 @@ run_browser <- callModule(popkinr::serverBrowser, "run_browser",
 metadata_browser <- callModule(popkinr::serverBrowser, "metadata_browser",
                                root_directory = browsing_root,
                                initial_selection = user_initial_selection,
-                               file_extensions = c("tar.gz", "zip"),
+                               file_extensions = c("tar.gz", "tgz", "zip"),
                                folder_shortcuts = reactive({
                                  if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
                                }),
@@ -49,7 +49,7 @@ metadata_browser <- callModule(popkinr::serverBrowser, "metadata_browser",
 comparison_browser <- callModule(popkinr::serverBrowser, "comparison_browser",
                                  root_directory = browsing_root,
                                  initial_selection = user_initial_selection,
-                                 file_extensions = c("tar.gz", "zip"),
+                                 file_extensions = c("tar.gz", "tgz", "zip"),
                                  folder_shortcuts = reactive({
                                    if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
                                  }),

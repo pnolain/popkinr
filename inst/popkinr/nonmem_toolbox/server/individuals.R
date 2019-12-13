@@ -22,7 +22,7 @@
         })
 
     filtered_run_show_mdv() %>%
-      group_by(UQS(grps)) %>%
+      group_by(!!!(grps)) %>%
       plot_parameters_distributions(parameters = parameters_selection,
                                     baseline_only = only_baseline,
                                     type = plot_type,
@@ -48,7 +48,7 @@
     grps <- map(split_by, as.symbol)
 
     list(data = filtered_run_show_mdv() %>%
-           group_by(UQS(grps)) %>%
+           group_by(!!!(grps)) %>%
            summarize_parameters_distributions(parameters = parameters_selection,
                                               baseline_only = only_baseline),
          formatting = function(x) x)
@@ -243,7 +243,7 @@
     grps <- map(setdiff(input$p_p_correlations_group, ""), as.symbol)
 
     filtered_run_show_mdv() %>%
-      group_by(UQS(grps)) %>%
+      group_by(!!!(grps)) %>%
       plot_parameters_correlations(parameters = c(selected_params$a$name, selected_params$b$name),
                                    type = "scatterplot",
                                    baseline_only = only_baseline,
@@ -316,7 +316,7 @@
     grps <- map(split_by, as.symbol)
 
     filtered_run_show_mdv() %>%
-      group_by(UQS(grps)) %>%
+      group_by(!!!(grps)) %>%
       plot_continuous_covariates_distributions(covariates = cont_covs,
                                                baseline_only = only_baseline,
                                                type = plot_type,
@@ -342,7 +342,7 @@
     grps <- map(split_by, as.symbol)
 
     g <- filtered_run_show_mdv() %>%
-      group_by(UQS(grps)) %>%
+      group_by(!!!(grps)) %>%
       plot_categorical_covariates_distributions(covariates = cat_covs,
                                                 baseline_only = only_baseline,
                                                 order = order,
@@ -364,7 +364,7 @@
     grps <- map(split_by, as.symbol)
 
     df <- filtered_run_show_mdv() %>%
-      group_by(UQS(grps)) %>%
+      group_by(!!!(grps)) %>%
       summarize_continuous_covariates(covariates = req(input$selected_continuous_covariates),
                                       baseline_only = only_baseline)
 
@@ -409,7 +409,7 @@
     grps <- map(split_by, as.symbol)
 
     filtered_run_show_mdv() %>%
-      group_by(UQS(grps)) %>%
+      group_by(!!!(grps)) %>%
       summarize_categorical_covariates(covariates = req(input$selected_categorical_covariates),
                                      baseline_only = only_baseline)
   })
@@ -588,7 +588,7 @@
     grps <- map(setdiff(input$c_c_correlations_group, ""), as.symbol)
 
     filtered_run_show_mdv() %>%
-      group_by(UQS(grps)) %>%
+      group_by(!!!(grps)) %>%
       plot_covariates_correlations(covariates = c(selected_covs$a$name, selected_covs$b$name),
                                    type = "scatterplot",
                                    baseline_only = only_baseline,
@@ -805,7 +805,7 @@
     grps <- map(setdiff(input$p_c_correlations_group, ""), as.symbol)
 
     g <- filtered_run_show_mdv() %>%
-      group_by(UQS(grps)) %>%
+      group_by(!!!(grps)) %>%
       plot_parameters_vs_continuous_covariates(parameters = selected_param$name,
                                              covariates = selected_cov$name,
                                              type = "scatterplot",

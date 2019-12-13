@@ -4,7 +4,7 @@ session$onSessionEnded(function() {
     unlink(app_temp_directory, recursive = TRUE)
   }
 
-  save_xml_data()
+  # save_xml_data()
 
   # stopApp()
 })
@@ -133,7 +133,7 @@ observe({
   selection_is_nm_run <- FALSE
 
   if(length(run_browser()$file) == 1){
-    selection_is_nm_run <- str_detect(run_browser()$file, "(\\.tar\\.gz|\\.zip)$")
+    selection_is_nm_run <- str_detect(run_browser()$file, "(\\.tar\\.gz|\\.zip|\\.tgz)$")
   } else {
     dir_path <- run_browser()$folder
 
@@ -408,7 +408,7 @@ filtered_run <- reactive({
   run <- req(rv$run)
 
   run %>%
-    filter(UQS(rv$app_filters))
+    filter(!!!(rv$app_filters))
 })
 
 filtered_run_show_mdv <- reactive({
@@ -417,7 +417,7 @@ filtered_run_show_mdv <- reactive({
   no_mdv_filters <- discard(rv$app_filters, ~ all.equal(., quo(MDV == 0)) == TRUE)
 
   run %>%
-    filter(UQS(no_mdv_filters))
+    filter(!!!(no_mdv_filters))
 })
 
 filtered_run_reduced_baseline <- reactive({
