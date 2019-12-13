@@ -22,7 +22,7 @@ nonmem_toolbox <- function(run_path = NULL,
                            nmcheck_call = NULL, ...){
   toolbox_dir <- system.file("popkinr/nonmem_toolbox", package = "popkinr")
 
-  if(!is.null(run_path) && str_detect(run_path, "\\.tar\\.gz$")){
+  if(!is.null(run_path) && str_detect(run_path, "(\\.tar\\.gz|\\.zip|\\.tgz)$")){
     run_path <- normalizePath(run_path)
 
     Sys.setenv(STARTUP_PATH = run_path)

@@ -11,7 +11,7 @@ shinyServer(function(input, output){
   filedata <- reactive({
 
     if(!is.null(values$dataset_path)& input$Demo==0){
-        if( str_detect(values$dataset_path, "(\\.tar\\.gz|\\.zip)$")){
+        if( str_detect(values$dataset_path, "(\\.tar\\.gz|\\.zip|\\.tgz)$")){
         run <- pmxploit::load_nm_run(values$dataset_path, temp_directory = str_c(tempdir(), "pmxploit"),
                               load_tables = TRUE, read_initial_values = TRUE,
                               keep_tempfiles = FALSE, extract_everything = FALSE,
@@ -121,7 +121,7 @@ shinyServer(function(input, output){
       labelcheck=""
 
     }
-    else if (!is.null(infileraw) && str_detect(infileraw, "(\\.tar\\.gz|\\.zip)$")==F){
+    else if (!is.null(infileraw) && str_detect(infileraw, "(\\.tar\\.gz|\\.zip|\\.tgz)$")==F){
       L=readLines(infileraw)
       L1=readLines(infileraw,n=1)
 
@@ -140,7 +140,7 @@ shinyServer(function(input, output){
     }
 
 
-     else if(!is.null(infileraw) && str_detect(infileraw, "(\\.tar\\.gz|\\.zip)$")){
+     else if(!is.null(infileraw) && str_detect(infileraw, "(\\.tar\\.gz|\\.zip|\\.tgz)$")){
        textfile= "OK nm"
        colorcheck="green"
        iconcheck='check-square'
@@ -1513,7 +1513,7 @@ shinyServer(function(input, output){
   dataset_browser <- callModule(popkinr::serverBrowser, "dataset_browser",
                                 root_directory = browsing_root,
                                 initial_selection = user_initial_selection,
-                                file_extensions = c("dat", "csv", "xslx","tar.gz", "zip"),
+                                file_extensions = c("dat", "csv", "xslx","tar.gz", "tgz", "zip"),
                                 folder_shortcuts = reactive({
                                   if(nrow(startup_last_runs) > 0) return(dirname(startup_last_runs$path))
                                 })
@@ -1529,7 +1529,6 @@ shinyServer(function(input, output){
       title = "Select a dataset file",
       size = "l",
       popkinr::serverBrowserUI("dataset_browser"),
-      # div(tags$em("* Legend: Bold: directories containing *.tar.gz or *.zip archive files; Red: directories containing NONMEM run data")),
       footer = list(modalButton("Close"),
                     actionButton("load_dataset", "Load selection")),
       easyClose = TRUE)
