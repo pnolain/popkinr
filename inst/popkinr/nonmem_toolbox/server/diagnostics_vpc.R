@@ -155,7 +155,9 @@ observeEvent(input$vpc_run, {
   #           str_c(app_temp_vpc_directory, run$info$dataset_file, sep = "/"))
 
   # option 2
-  write_csv(select(run$tables$dataset, one_of(cs_data$input$column)),
+  ds_col_names <- intersect(colnames(run$tables$dataset), c(cs_data$input$column,
+                                                            cs_data$input$synonym) )
+  write_csv(select(run$tables$dataset, !!ds_col_names),
             path = str_c(app_temp_vpc_directory, run$info$dataset_file, sep = "/"),
             na = ".",
             col_names = FALSE)
@@ -305,9 +307,9 @@ observe({
       }
 
       sim_df <- simtab %>%
-        nest(-REP, .key = "sim") %>%
-        mutate(obs = list(temp_obs_df)) %>%
-        unnest(obs) %>%
+        split(.$REP)%>%
+        map(bind_cols, temp_obs_df) %>%
+        bind_rows() %>%
         select(REP, everything())
 
       rv_vpc$results <- list(n_simulations = rv_vpc$n_simulations,
