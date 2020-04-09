@@ -119,6 +119,8 @@ serverBrowser <- function(input, output, session, root_directory,
 
     time_sorted <- (sort_type == "time")
 
+
+
     # chain of directory from root to selection
     dir_chain <- selection
 
@@ -139,7 +141,7 @@ serverBrowser <- function(input, output, session, root_directory,
 
     sub_tree <- function(parent, level = 1) {
       sub_dirs <- list.files(parent, recursive = FALSE, full.names = TRUE) %>%
-        .[which(dir.exists(.))] %>% # remove symbolik links
+        discard(fs::is_link) %>% # remove symbolik links
         normalizePath()
 
       # directories dataframe

@@ -4,12 +4,22 @@
 \alias{serverBrowser}
 \title{Server Browser Module}
 \usage{
-serverBrowser(input, output, session, root_directory,
-  initial_selection = NULL, file_extensions = NULL,
-  folder_shortcuts = NULL, formatting_function = NULL)
+serverBrowser(
+  input,
+  output,
+  session,
+  root_directory,
+  initial_selection = NULL,
+  file_extensions = NULL,
+  folder_shortcuts = NULL,
+  formatting_function = NULL
+)
 }
 \arguments{
 \item{formatting_function}{}
+}
+\value{
+
 }
 \description{
 Server Browser Module

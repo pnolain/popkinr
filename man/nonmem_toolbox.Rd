@@ -4,8 +4,14 @@
 \alias{nonmem_toolbox}
 \title{NONMEM Toolbox}
 \usage{
-nonmem_toolbox(run_path = NULL, nonmem_exe = NULL,
-  nonmem_call = NULL, nmcheck_exe = NULL, nmcheck_call = NULL, ...)
+nonmem_toolbox(
+  run_path = NULL,
+  nonmem_exe = NULL,
+  nonmem_call = NULL,
+  nmcheck_exe = NULL,
+  nmcheck_call = NULL,
+  ...
+)
 }
 \arguments{
 \item{run_path}{character string pointing to the path of a run to load at startup.

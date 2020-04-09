@@ -13,6 +13,7 @@ Imports:
   DT,
   flexdashboard,
   future,
+  fs,
   ggplot2,
   ggrepel,
   hms,
@@ -46,4 +47,4 @@ Imports:
   xml2,
   zoo
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0

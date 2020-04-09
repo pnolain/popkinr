@@ -4,9 +4,17 @@
 \alias{nonmem_monitor}
 \title{NONMEM Launcher}
 \usage{
-nonmem_monitor(type = "local", nonmem_exe = NULL, nonmem_call = NULL,
-  nmcheck_exe = NULL, nmcheck_call = NULL, nonmem_parafile = NULL,
-  execution_dir = "pmxrun", results_subdir = "results", ...)
+nonmem_monitor(
+  type = "local",
+  nonmem_exe = NULL,
+  nonmem_call = NULL,
+  nmcheck_exe = NULL,
+  nmcheck_call = NULL,
+  nonmem_parafile = NULL,
+  execution_dir = "pmxrun",
+  results_subdir = "results",
+  ...
+)
 }
 \arguments{
 \item{results_subdir}{}

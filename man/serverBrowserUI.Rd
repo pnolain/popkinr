@@ -9,6 +9,9 @@ serverBrowserUI(id, max_height = "600px")
 \arguments{
 \item{max_height}{}
 }
+\value{
+
+}
 \description{
 Server Browser Module UI
 }
