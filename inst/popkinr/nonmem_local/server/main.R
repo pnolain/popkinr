@@ -55,20 +55,15 @@ if(!dir.exists(app_temp_directory))
 sys_info <- Sys.info() %>% as.list() %>% tbl_df()
 
 initial_control_file_selection_folder <- env_popkin_root
-initial_evaluation_run_selection_folder <- env_popkin_root
 initial_misc_run_selection_folder <- env_popkin_root
 
 if(file.exists(app_xml_path)){
   xml_data <- read_xml(app_xml_path)
   run_folder <- xml_text(xml_find_first(xml_data, "//pmxecute/folders/run"))
-  evaluation_folder <- xml_text(xml_find_first(xml_data, "//pmxecute/folders/evaluation"))
   misc_folder <- xml_text(xml_find_first(xml_data, "//pmxecute/folders/misc"))
 
   if(dir.exists(run_folder))
     initial_control_file_selection_folder <- run_folder
-
-  if(dir.exists(evaluation_folder))
-    initial_evaluation_run_selection_folder <- evaluation_folder
 
   if(dir.exists(misc_folder))
     initial_misc_run_selection_folder <- misc_folder
@@ -108,7 +103,7 @@ if(file.exists(app_xml_path)){
     xml_find_all("/popkinr/pmxploit/history/run")
 
   if(length(run_nodes) > 0){
-    last_runs <- as_list(run_nodes) %>%
+    last_runs <- xml2::as_list(run_nodes) %>%
       map(~ list(date = lubridate::ymd_hms(attr(., "date")), path = attr(., "path"))) %>%
       bind_rows() %>%
       arrange(date)
@@ -124,33 +119,21 @@ rv <- reactiveValues(run_number = NULL,
                      previous_runs = startup_last_runs,
                      control_files = NULL,
                      selected_cs_id = NULL,
-                     evaluation_run_path = NULL,
                      misc_run_path = NULL,
                      temp_run_details = NULL)
 
 control_file_browser <- callModule(popkinr::serverBrowser, "control_file_browser",
-                           root_directory = browsing_root,
-                           initial_selection = initial_control_file_selection_folder,
-                           file_extensions = c("con", "ctl", "mod"),
-                           folder_shortcuts = reactive({
-                             if(nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
-                           }),
-                           formatting_function = control_file_browser_formatting)
+                                   root_directory = browsing_root,
+                                   initial_selection = initial_control_file_selection_folder,
+                                   dir_highlight = NULL,
+                                   file_highlight = "(con|ctl|mod)$")
 
 misc_run_browser <- callModule(popkinr::serverBrowser,
                        "misc_run_browser",
                        root_directory = browsing_root,
                        initial_selection = initial_misc_run_selection_folder,
-                       file_extensions = c("tar.gz", "tgz", "zip"),
-                       formatting_function = run_browser_formatting)
-
-evaluation_run_browser <- callModule(popkinr::serverBrowser,
-                             "evaluation_run_browser",
-                             root_directory = browsing_root,
-                             initial_selection = initial_evaluation_run_selection_folder,
-                             file_extensions = c("tar.gz", "tgz", "zip"),
-                             formatting_function = run_browser_formatting)
-
+                       dir_highlight = NULL,
+                       file_highlight = "(zip|gz)$")
 
 makeReactiveTrigger <- function() {
   tmp_rv <- reactiveValues(a = 0)
@@ -200,19 +183,7 @@ output$usage_stats <- renderUI({
            sprintf("%s (%s %%)", cpu, round(cpu / availableCores() * 100)))
 })
 
-output$jacknife_n <- renderText({
-  run <- req(evaluation_run())
-
-  n_ids <- run$info$number_of_subjects
-
-  sprintf("%s runs will be generated", n_ids)
-})
-
 observe({
-  shinyjs::toggle("chain_content", condition = input$evaluation_method == "chain")
-  shinyjs::toggle("bootstrap_content", condition = input$evaluation_method == "bootstrap")
-  shinyjs::toggle("jacknife_content", condition = input$evaluation_method == "jacknife")
-
   shinyjs::toggle("simulation_content", condition = input$misc_method == "simulation")
   shinyjs::toggle("prior_content", condition = input$misc_method == "prior")
 

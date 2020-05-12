@@ -3,7 +3,7 @@ submission_trigger <- makeReactiveTrigger()
 local_list_trigger <- makeReactiveTrigger()
 
 observeEvent(input$browse_control_file, {
-  control_file_browser()$initialize_ui(force = TRUE)
+  control_file_browser()$initialize_ui()
 
   showModal(modalDialog(
     title = "Select control file(s)",
@@ -149,14 +149,6 @@ observeEvent(input$start_run, {
 
     rv$control_files <- NULL
     rv$selected_cs_id <- NULL
-  } else {
-    if(input$evaluation_method == "chain"){
-      start_chain()
-    } else if(input$evaluation_method == "bootstrap"){
-      start_bootstrap()
-    } else if(input$evaluation_method == "jacknife"){
-      start_jacknife()
-    }
   }
 
   local_list_trigger$trigger()
@@ -324,8 +316,6 @@ observe({
   if(input$run_box == "run"){
     can_run <- ((!is.null(rv$control_files) && nrow(filter(rv$control_files, !error | is.na(error))) > 0) &&
                   (!is.null(input$results_subdir_name) && input$results_subdir_name != ""))
-  } else {
-    can_run <- !is.null(evaluation_run())
   }
 
   shinyjs::toggleState("start_run", condition = can_run)

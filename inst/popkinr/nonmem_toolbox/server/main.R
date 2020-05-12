@@ -101,9 +101,8 @@ output$open_last_run <- renderUI({
                            rv$previous_runs <- rv$previous_runs %>%
                              filter(path != app$path)
                          } else {
-                           run_browser()$reset(folder_selection = dirname(app$path),
-                                               file_selection = app$path)
-                           metadata_browser()$reset(folder_selection = dirname(app$path))
+                           run_browser()$reset(selection = dirname(app$path))
+                           metadata_browser()$reset(selection = dirname(app$path))
 
                            #open_run(app$path)
                            rv$run_path <- app$path
@@ -131,26 +130,22 @@ output$open_last_run <- renderUI({
 observe({
 
   selection_is_nm_run <- FALSE
-
-  if(length(run_browser()$file) == 1){
-    selection_is_nm_run <- str_detect(run_browser()$file, "(\\.tar\\.gz|\\.zip|\\.tgz)$")
-  } else {
+  if(!is.na(run_browser()$file)){
+    selection_is_nm_run <- str_detect(run_browser()$file, "(zip|gz)$")
+  } else if (!is.na(run_browser()$folder)){
     dir_path <- run_browser()$folder
+    selection_is_nm_run <- is_nm_run_folder(run_browser()$folder)
 
-    if(!is.null(dir_path)){
-      dir_files <- list.files(dir_path, ignore.case = TRUE)
-
-      selection_is_nm_run <- all(c("xml", "ext") %in% safe_file_ext(dir_files)$result)
-    }
+    # browser()
   }
 
   shinyjs::toggleState("load_run", condition = selection_is_nm_run)
 })
 
 observeEvent(input$load_run, {
-  if(length(run_browser()$file) == 1){
+  if(!is.na(run_browser()$file)){
     rv$run_path <- run_browser()$file
-  } else {
+  } else if(!is.na(run_browser()$folder)){
     rv$run_path <- run_browser()$folder
   }
 })
@@ -237,7 +232,7 @@ open_run <- function(run_path){
     notifs <- bind_rows(notifs, app_errors)
   }
 
-  comparison_browser()$reset(folder_selection = dirname(run_path))
+  comparison_browser()$reset(selection = dirname(run_path))
 
   if(!is.null(run_load$result$error)) {
     updateProgress(value = 1, detail = "Error !")

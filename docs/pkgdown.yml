@@ -1,0 +1,7 @@
+pandoc: 2.3.1
+pkgdown: 1.5.1
+pkgdown_sha: ~
+articles:
+  launch_applications: launch_applications.html
+last_built: 2020-05-12T13:02Z
+

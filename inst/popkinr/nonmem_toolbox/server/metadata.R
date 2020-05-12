@@ -134,7 +134,7 @@ observeEvent(input$covariates_metadata,{
 })
 
 observeEvent(input$browse_metadata, {
-  metadata_browser()$initialize_ui(force = TRUE)
+  metadata_browser()$initialize_ui()
 
   showModal(modalDialog(
     title = "Select a run to read metadata from",

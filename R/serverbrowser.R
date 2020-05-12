@@ -1,330 +1,168 @@
-#' Server Browser Module UI
+#' @rdname serverbrowser
 #'
-#' @param id
-#' @param max_height
+#' @param id UI element id
 #'
-#' @return
 #' @export
 #'
 #' @examples
-serverBrowserUI <- function(id, max_height = "600px"){
-
+serverBrowserUI <- function(id) {
   ns <- NS(id)
-
-  shinyjs::inlineCSS("#browser_container.waiting, #browser_container.waiting * { cursor: wait; }")
-
-  div(
-    fluidRow(
-      column(3,
-             selectInput(ns("sorting"), "Sort files by", choices = c("Date" = "time", "Name" = "name"))),
-      column(9,
-             uiOutput(ns("folder_shortcuts")))),
-    div(id = "browser_container",
-        style = sprintf("overflow: auto; max-height:%s;", max_height),
-        shinyTree(ns("browsing_tree")))
+  tagList(
+    uiOutput(ns("dir_path")),
+    shinyTree(ns("tree"),
+    types = "
+    {
+    'directory': {'icon': 'fa fa-archive'},
+    'directory-highlight': {'icon': 'fa fa-archive', 'a_attr' : { 'style' : 'font-weight:bold' }},
+    'file':{'icon': 'fa fa-file'},
+    'file-highlight': {'icon': 'fa fa-file', 'a_attr' : { 'style' : 'color:red' }}
+    }")
   )
 }
 
 
-#' Server Browser Module
+#' @name serverbrowser
+#' @title Server browser tree module
 #'
-#' @param input
-#' @param output
-#' @param session
-#' @param root_directory
-#' @param initial_selection
-#' @param file_extensions
-#' @param folder_shortcuts
-#' @param formatting_function
+#' @param input shiny input object
+#' @param output shiny output object
+#' @param session shiny session object
+#' @param root_directory character. Path of the root directory to browse from.
+#'   Defaults to root directory.
+#' @param initial_selection optional character. Path of the selected folder at
+#'   start.
+#' @param dir_highlight optional character or function. If character, regular
+#'   expression matching directory elements to highlight. If function, one
+#'   argument function used to determine if the element should be highlighted.
+#' @param file_highlight optional character or function. If character, regular
+#'   expression matching file elements to highlight. If function, one
+#'   argument function used to determine if the element should be highlighted.
 #'
-#' @return
+#' @return A shiny module
+#'
 #' @export
 #'
-#' @examples
-serverBrowser <- function(input, output, session, root_directory,
-                          initial_selection = NULL, file_extensions = NULL, folder_shortcuts = NULL,
-                          formatting_function = NULL){
+serverBrowser <- function(input, output, session, root_directory = "/",
+                             initial_selection = NULL, dir_highlight = NULL, file_highlight = NULL) {
 
-  file_pattern <- sprintf("\\.(%s)$", paste(str_replace(file_extensions, "\\.", "\\\\."), collapse = "|"))
+  root_dir <- root_directory
 
-  is_windows <- (tolower(Sys.info()["sysname"]) == "windows")
+  rvx <- reactiveValues(selection = list(is_dir = is_dir(initial_selection),
+                                         path = initial_selection),
+                        refresh = Sys.time())
 
-  if(is_windows){
-    win_disks <- system("wmic logicaldisk get name", intern = TRUE) %>%
-      str_subset("^[B-Z]:") %>%
-      str_trim()
+  list_files <- function(path){
+    dirs <- dir_ls(path, type = "directory", recurse = FALSE, full.names = TRUE) %>% path_real()
+    allFiles <- dir_ls(path, type = "file") %>% path_real()
+    files <- setdiff(allFiles, dirs)
+    np <- path_real(path)
+
+    selected_path <- rvx$selection$path
+
+    files_str <- lapply(files, function(x){
+      structure(basename(x),
+                sttype="file",
+                stpath = x,
+                stselected = identical(x, selected_path))
+    } )
+
+      subtree <- append(lapply(dirs, function(nextDir){
+        structure(nextDir,
+                  sttype = "directory",
+                  stpath = nextDir,
+                  stselected = identical(nextDir, selected_path))
+      }), values = files_str)
+
+      if(path != root_dir){
+        dirs <- c("..", dirs)
+
+        subtree <- append(list(structure("..",
+                                         stpath = np,
+                                         sttype = "directory")),
+                          values = subtree)
+      }
+
+      names(subtree) <- basename(append(dirs, files))
+
+    subtree
   }
 
-  rv <- reactiveValues(inner_root_directory = NULL,
-                       parent_directory = NULL,
-                       file_selection = NULL,
-                       folder_selection = initial_selection,
-                       prev_data = NULL,
-                       refresh_flag = Sys.time(),
-                       force_scroll = Sys.time())
+  output$dir_path <- renderUI({
+    selected_dir <- ifelse(rvx$selection$is_dir, rvx$selection$path, dirname(rvx$selection$path))
 
-  # Tree is initialized without nodes
-  output$browsing_tree <- renderEmptyTree()
-
-  outputOptions(output, "browsing_tree", suspendWhenHidden = FALSE)
-
-  # An observer is used to trigger a tree update with new data.
-  observe_stuff <- function(){
-    rv$inner_root_directory <- ifelse(is.reactive(root_directory),
-                                      root_directory(),
-                                      root_directory)
-
-    if(is.null(rv$parent_directory)){
-      rv$parent_directory <- ifelse(is.null(rv$folder_selection), rv$inner_root_directory, rv$folder_selection)
-    }
-
-    updated_browsing_tree <- json_tree()
-
-    if(!(identical(rv$prev_data, updated_browsing_tree))){
-      updateTree(session, "browsing_tree", updated_browsing_tree)
-      rv$prev_data <-updated_browsing_tree
-    }
-  }
-
-  safe_observe <- purrr::safely(observe_stuff)
-
-  observe({
-
-    # session$sendCustomMessage(type = "show_waiting_cursor", message = "browser_container")
-    shinyjs::runjs("$('#browser_container').addClass('waiting');")
-
-    so <- safe_observe()
-
-    if(!is.null(so$error)){
-      print(so$error)
-      print(so$error$message)
-    }
-
-    shinyjs::runjs("$('#browser_container').removeClass('waiting');")
-    # session$sendCustomMessage(type = "hide_waiting_cursor", message = "browser_container")
+    tags$strong(selected_dir)
   })
 
-  browsing_tree <- reactive({
-    rv$refresh_flag
-    # current selection
-    selection <- rv$parent_directory %>% normalizePath
+  output$tree <- renderTree({
+    rvx$refresh
 
-    # return if selection is a file
-    if(str_detect(selection, file_pattern)) return(NULL)
+    selected_dir <- ifelse(rvx$selection$is_dir, rvx$selection$path, dirname(rvx$selection$path))
 
-    if(is.null(input$sorting))
-      return(NULL)
+    tree <- list_files(selected_dir)
 
-    sort_type <- input$sorting
+    if(!is.null(dir_highlight)){
+      tree <- tree %>%
+        modify_if(
+          .p = function(x){
+            if(attr(x, "sttype") != "directory") return(FALSE)
 
-    time_sorted <- (sort_type == "time")
-
-    # chain of directory from root to selection
-    dir_chain <- selection
-
-    if(is_windows){
-      prev_dir <- NULL
-      while(!(((fc <- first(dir_chain)) %in% c("/", normalizePath(rv$inner_root_directory)))) &&
-            fc != dirname(fc)){
-        prev_dir <- dirname(fc)
-        dir_chain <- c(prev_dir, dir_chain)
-      }
-
-      dir_chain <- normalizePath(dir_chain)
-    } else {
-      while(!(first(dir_chain) %in% c("/", normalizePath(rv$inner_root_directory)))){
-        dir_chain <- c(dirname(first(dir_chain)), dir_chain)
-      }
+            if(is.function(dir_highlight)){
+              dir_highlight(x)
+            } else {
+              str_detect(basename(x), dir_highlight)
+            }
+          },
+          .f = function(x){
+            attr(x, "sttype") <- "directory-highlight"
+            x
+          })
     }
 
-    sub_tree <- function(parent, level = 1) {
-      sub_dirs <- list.files(parent, recursive = FALSE, full.names = TRUE) %>%
-        .[which(dir.exists(.))] %>% # remove symbolik links
-        normalizePath()
+    if(!is.null(file_highlight)){
+      tree <- tree %>%
+        modify_if(
+          .p = function(x){
+            if(attr(x, "sttype") != "file") return(FALSE)
 
-      # directories dataframe
-      d_df <- seq_along(sub_dirs) %>%
-        map_df(function(i){
-          sub_dir <- sub_dirs[i]
-
-          children <- NULL
-          if(sub_dir %in% dir_chain) {
-            children <- sub_tree(sub_dir, level = level + 1)
-          }
-
-          label <- basename(sub_dir)
-
-          d_df <- tibble(id = sub_dir,
-                         html_id = sprintf("j%s_%s", level, i),
-                         text = label,
-                         state = "FLAG",
-                         children = list(children))
-
-          if(!is.null(formatting_function)){
-            d_df <- d_df %>%
-              mutate(text = pmap_chr(list(id = id, text = text), formatting_function))
-          }
-
-          if(sub_dir == rv$folder_selection){
-            d_df$state = "FLAG2"
-          }
-
-          d_df
-        })
-
-      # if current parent is selected, show files matching file pattern
-      if(parent %in% dir_chain) {
-
-        dir_files <- list.files(parent, full.names = TRUE, pattern = file_pattern) %>%
-          .[which(file.exists(.))] %>% # remove symbolik links
-          normalizePath() %>%
-          setdiff(sub_dirs)
-
-        if(length(dir_files) > 0 & time_sorted){
-          time_info <- map_df(dir_files, function(x) tibble(file = x, time = file.info(x)$ctime)) %>%
-            arrange(desc(time))
-
-          dir_files <- time_info$file
-        }
-
-        f_df <- map_df(dir_files, function(x){
-          tibble(id = x,
-                 text = basename(x),
-                 state = "FLAG",
-                 icon = FALSE)
-        }) %>% as_tibble()
-
-        return(bind_rows(d_df, f_df))
-      } else {
-        d_df
-      }
+            if(is.function(file_highlight)){
+              file_highlight(x)
+            } else {
+              str_detect(basename(x), file_highlight)
+            }
+          },
+          .f = function(x){
+            attr(x, "sttype") <- "file-highlight"
+            x
+          })
     }
-
-    # start the tree from root
-    tree <- sub_tree(dir_chain[1])
-
-    if(is_windows && rv$inner_root_directory == "/"){
-
-      tree2 <- tibble(id = str_c(win_disks, "\\"),
-                      html_id = str_c("j0_", seq_along(id)),
-                      text = win_disks,
-                      state = "FLAG",
-                      children = map(id, function(x){
-                        if(x == normalizePath(dirname(tree[1,]$id)))
-                          return(tree)
-
-                        NA
-                      }))
-
-      tree <- tree2
-
-    }
-
 
     tree
   })
 
-  json_tree <- reactive({
+  observeEvent(input$tree,
+               {
+                 node <- get_selected(input$tree)
+                 req(length(node)> 0)
+                 sel <- node[[1]]
 
-    df_tree <- browsing_tree()
+                 sel_path <- ifelse(sel == "..",
+                                    dirname(attr(sel, "stpath")),
+                                    attr(sel,"stpath"))
 
-    if(is.null(df_tree) || nrow(df_tree) == 0)
-      return(NULL)
-
-    # return a JSON string (with 2 hacks for correct display)
-    res <- toJSON(df_tree) %>%
-      str_replace_all("\"FLAG2\"", "{\"opened\":true, \"selected\":true}") %>% # hack 1
-      str_replace_all("\"FLAG\"", "{\"opened\":true}") %>% # hack 2
-      str_replace_all(",\"children\":\\[null\\]", "") # hack 3
-
-    res
-  })
-
-  observeEvent(input$browsing_tree, {
-    sel <- get_selected(input$browsing_tree, format = "classid")
-
-    req(length(sel) > 0)
-
-    selected_items <- map_chr(sel, function(x) attr(x, "id"))
-
-    items_df <- tibble(path = selected_items,
-                       type = ifelse(str_detect(path, file_pattern), "file", "directory"))
-
-    file <- items_df %>% filter(type == "file")
-
-    rv$file_selection <- file$path
-
-    dir_nodes <- items_df %>% filter(type == "directory")
-
-    if(nrow(dir_nodes) > 0){
-      rv$parent_directory <- dir_nodes$path[1]
-      rv$folder_selection <- dir_nodes$path[1]
-    }
-  })
-
-  inner_folder_shortcuts <- reactive({
-    if(is.null(folder_shortcuts)) return(NULL)
-
-    folder_shortcuts()
-  })
-
-  output$folder_shortcuts <- renderUI({
-    folders <- req(inner_folder_shortcuts())
-
-    folders_paths <- folders[dir.exists(folders)] %>% normalizePath() %>% unique()
-
-    selected_dir <- isolate(rv$folder_selection)
-
-    if(is.null(selected_dir) || !dir.exists(selected_dir))
-      selected_dir <- initial_selection
-
-    selectInput(session$ns("folder_shortcuts"),
-                "Jump to folder",
-                choices = c("/", sort(folders_paths)),
-                selected = selected_dir,
-                width = "100%")
-  })
-
-  observeEvent(input$folder_shortcuts, {
-    selected_dir <- input$folder_shortcuts
-
-    if(dir.exists(selected_dir)){
-      rv$file_selection <- NULL
-      rv$parent_directory <- selected_dir
-      rv$folder_selection <- selected_dir
-
-      rv$force_scroll <- Sys.time()
-    }
-  })
-
-  observeEvent(input$browsing_tree, {
-    # Scroll to directory item when tree is updated
-    if(!is.null(rv$force_scroll) && rv$folder_selection != "/"){
-
-      shinyjs::runjs(sprintf("var id = '%s'; var elem = document.getElementById(id);
-                             if(elem !== null) elem.scrollIntoView();", rv$folder_selection))
-
-      # shinyjs::runjs(sprintf("$('#' + %s).scrollIntoView();", rv$folder_selection))
-
-      rv$force_scroll <- NULL
-    }
-  })
+                 rvx$selection <- list(is_dir = dir.exists(sel_path),
+                                      path = sel_path)
+               })
 
   return(reactive({
-    list(folder = rv$folder_selection,
-         file = rv$file_selection,
-         reset = function(parent_directory = NULL, folder_selection = NULL, file_selection = NULL){
-           rv$inner_root_directory <- NULL
-           rv$parent_directory <- parent_directory
-           rv$file_selection <- file_selection
-           rv$folder_selection <- folder_selection
+    list(folder = ifelse(rvx$selection$is_dir, rvx$selection$path, NA_character_),
+         file = ifelse(!rvx$selection$is_dir, rvx$selection$path, NA_character_),
+         reset = function(selection = NULL){
+           selection <- ifelse(is.null(selection), initial_selection, selection)
+
+           rvx$selection = list(is_dir = is_dir(selection),
+                                path = selection)
          },
-         initialize_ui = function(force = FALSE){
-           rv$prev_data <- NULL
-
-           if(force){
-             rv$refresh_flag <- Sys.time()
-           }
+         initialize_ui = function(){
+             rvx$refresh <- Sys.time()
          })}))
-
 }

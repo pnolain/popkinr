@@ -13,7 +13,6 @@ server <- function(input, output, session){
       new_pmxecute_node %>%
         xml_add_child("folders") %>%
         xml_add_child("run", control_file_browser()$folder) %>%
-        xml_add_sibling("evaluation", evaluation_run_browser()$folder) %>%
         xml_add_sibling("misc", misc_run_browser()$folder)
 
       if(file.exists(app_xml_path)){
@@ -52,7 +51,6 @@ server <- function(input, output, session){
   source(file.path("server", "watcher.R"),  local = TRUE)$value
   source(file.path("server", "monitoring.R"),  local = TRUE)$value
   source(file.path("server", "execution.R"),  local = TRUE)$value
-  source(file.path("server", "evaluation.R"),  local = TRUE)$value
   source(file.path("server", "misc.R"),  local = TRUE)$value
 
   options(DT.options = list(searching = F))

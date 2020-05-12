@@ -130,7 +130,7 @@ observe({
 # Comparison tab----
 
 observeEvent(input$select_runs_to_compare, {
-  comparison_browser()$initialize_ui(force = TRUE)
+  comparison_browser()$initialize_ui()
 
   showModal(
     modalDialog(
@@ -827,10 +827,8 @@ observeEvent(input$click_open_run_to_compare, {
     updateTabItems(session, "main_menu", selected = "home")
 
     rv$run_path <- r_path
-    run_browser()$reset(folder_selection = dirname(r_path),
-                        file_selection = r_path)
-    metadata_browser()$reset(folder_selection = dirname(r_path),
-                             file_selection = r_path)
+    run_browser()$reset(selection = dirname(r_path))
+    metadata_browser()$reset(selection = dirname(r_path))
 
 
     rv_comp$comparison_data <- rv_comp$comparison_data %>%

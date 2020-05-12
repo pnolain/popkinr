@@ -89,7 +89,7 @@ nonmem_toolbox(nonmem_exe = "/path/to/nonmem/run/nmfe74",
 
 Application for launching and monitoring NONMEM runs on a local setup.
 
-Provides control file generation functionalities for models with $PRIOR, $CHAIN processing or bootstrapping.
+Provides control file generation functionalities for models with $PRIOR and for $SIMULATION.
 
 ```{r, eval = FALSE}
 library(popkinr)

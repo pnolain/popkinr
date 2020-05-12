@@ -1,11 +1,10 @@
 observeEvent(input$browse_misc_run, {
-  misc_run_browser()$initialize_ui(force = TRUE)
+  misc_run_browser()$initialize_ui()
 
   showModal(modalDialog(
     title = "Select a run folder or archive",
     size = "l",
     popkinr::serverBrowserUI("misc_run_browser"),
-    div(tags$em("* Legend: Bold: directories containing *.tar.gz, .tgz or *.zip archive files; Red: directories containing NONMEM run data")),
     footer = list(modalButton("Close"),
                   actionButton("load_misc_run", "Load selection")),
     easyClose = TRUE)
@@ -13,9 +12,9 @@ observeEvent(input$browse_misc_run, {
 })
 
 observeEvent(input$load_misc_run, {
-  if(length(misc_run_browser()$file) == 1){
+  if(!is.na(misc_run_browser()$file)){
     rv$misc_run_path <- misc_run_browser()$file
-  } else {
+  } else if(!is.na(misc_run_browser()$folder)){
     rv$misc_run_path <- misc_run_browser()$folder
   }
 

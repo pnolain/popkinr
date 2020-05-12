@@ -66,7 +66,7 @@ read_previous_runs <- function(){
       xml_find_all("/popkinr/pmxploit/history/run")
 
     if(length(run_nodes) > 0){
-      last_runs <- as_list(run_nodes) %>%
+      last_runs <- xml2::as_list(run_nodes) %>%
         map(~ list(date = lubridate::ymd_hms(attr(., "date")), path = attr(., "path"))) %>%
         bind_rows() %>%
         arrange(date)

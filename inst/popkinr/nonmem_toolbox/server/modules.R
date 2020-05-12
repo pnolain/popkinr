@@ -28,32 +28,42 @@ run_browser_formatting <- function(id, text){
   text
 }
 
+
+# run_browser <- callModule(popkinr::serverBrowser, "run_browser",
+#                           root_directory = browsing_root,
+#                           initial_selection = user_initial_selection,
+#                           file_extensions = c("tar.gz", "tgz", "zip"),
+#                           folder_shortcuts = reactive({
+#                             if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
+#                           }),
+#                           formatting_function = run_browser_formatting)
+
+# x_browser <- callModule(popkinr::serverBrowser, "x_browser",
+#                           root_directory = browsing_root,
+#                           initial_selection = user_initial_selection,
+#                           file_extensions = c("tar.gz", "tgz", "zip"),
+#                           folder_shortcuts = reactive({
+#                             if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
+#                           }),
+#                           formatting_function = run_browser_formatting)
+
 run_browser <- callModule(popkinr::serverBrowser, "run_browser",
                           root_directory = browsing_root,
                           initial_selection = user_initial_selection,
-                          file_extensions = c("tar.gz", "tgz", "zip"),
-                          folder_shortcuts = reactive({
-                            if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
-                          }),
-                          formatting_function = run_browser_formatting)
+                          dir_highlight = function(x) is_nm_run_folder(x),
+                          file_highlight = "(zip|gz)$")
 
 metadata_browser <- callModule(popkinr::serverBrowser, "metadata_browser",
                                root_directory = browsing_root,
                                initial_selection = user_initial_selection,
-                               file_extensions = c("tar.gz", "tgz", "zip"),
-                               folder_shortcuts = reactive({
-                                 if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
-                               }),
-                               formatting_function = run_browser_formatting)
+                               dir_highlight = NULL,
+                               file_highlight = "(zip|gz)$")
 
 comparison_browser <- callModule(popkinr::serverBrowser, "comparison_browser",
                                  root_directory = browsing_root,
                                  initial_selection = user_initial_selection,
-                                 file_extensions = c("tar.gz", "tgz", "zip"),
-                                 folder_shortcuts = reactive({
-                                   if(!is.null(rv$previous_runs) && nrow(rv$previous_runs) > 0) return(dirname(rv$previous_runs$path))
-                                 }),
-                                 formatting_function = run_browser_formatting)
+                                 dir_highlight = NULL,
+                                 file_highlight = "(zip|gz)$")
 
 # table modules----
 callModule(extendedDT_with_code, "thetas_table", reactive_table = reactive(run_thetas_table()), filename = "THETAs")

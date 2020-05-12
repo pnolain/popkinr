@@ -1,12 +1,9 @@
 local_nonmem_pids <- reactivePoll(100, session,
                                   checkFunc = function(){
+                                    if(system2("which",  "pidof") == 1) return(NULL)
+
                                     q_system2 <- quietly(system2)
                                     pidof_cmd <- q_system2("pidof", "nonmem", stdout = TRUE)
-                                    # s_system2 <- safely(system2)
-                                    # pidof_cmd <- s_system2("pidof", "nonmem", stdout = TRUE)
-
-                                    # if(!is.null(pidof_cmd$error))
-                                    #   return("")
 
                                     if(length(pidof_cmd$warnings) > 0)
                                       return("")
@@ -14,14 +11,11 @@ local_nonmem_pids <- reactivePoll(100, session,
                                     pidof_cmd$result
                                   },
                                   valueFunc = function(){
+                                    if(system2("which",  "pidof") == 1) return(NULL)
+
                                     pidof_cmd <- system2("pidof", "nonmem", stdout = TRUE)
 
                                     if(length(pidof_cmd) == 0) return(NULL)
-                                    # s_system2 <- safely(system2)
-                                    # pidof_cmd <- s_system2("pidof", "nonmem", stdout = TRUE)
-                                    #
-                                    # if(!is.null(pidof_cmd$error))
-                                    #   return(NULL)
 
                                     pids <- pidof_cmd %>%
                                       str_extract_all("\\d+") %>%

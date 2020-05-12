@@ -1493,7 +1493,7 @@ shinyServer(function(input, output){
       xml_find_all("/popkinr/pmxploit/history/run")
 
     if(length(run_nodes) > 0){
-      last_runs <- as_list(run_nodes) %>%
+      last_runs <- xml2::as_list(run_nodes) %>%
         map(~ list(date = lubridate::ymd_hms(attr(., "date")), path = attr(., "path"))) %>%
         bind_rows() %>%
         arrange(date)
@@ -1513,17 +1513,11 @@ shinyServer(function(input, output){
   dataset_browser <- callModule(popkinr::serverBrowser, "dataset_browser",
                                 root_directory = browsing_root,
                                 initial_selection = user_initial_selection,
-                                file_extensions = c("dat", "csv", "xslx","tar.gz", "tgz", "zip"),
-                                folder_shortcuts = reactive({
-                                  if(nrow(startup_last_runs) > 0) return(dirname(startup_last_runs$path))
-                                })
-                                # ,
-                                # formatting_function = dataset_browser_formatting
-  )
-
+                                dir_highlight = NULL,
+                                file_highlight = "(zip|gz|dat|csv|xlsx)$")
 
   observeEvent(input$click_browse, {
-    dataset_browser()$initialize_ui(force = TRUE)
+    dataset_browser()$initialize_ui()
 
     showModal(modalDialog(
       title = "Select a dataset file",
