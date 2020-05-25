@@ -17,6 +17,16 @@ extendedDT_with_code_UI <- function(id, title = NULL){
 extendedDT_with_code <- function(input, output, session, reactive_table, filename = "table", digits = 4,
                           buttons = TRUE, r_code = TRUE, ...){
 
+  format_signif <- function(x, digits = 3) {
+    map_chr(x, function(y){
+      if(is.na(y)) return(NA_character_)
+
+      if(abs(y) < 1e-7) return(formatC(y, format = "e", digits = digits))
+
+      formatC(signif(y, digits), digits = digits, format="fg", flag="#") %>% str_remove("\\.$") %>% str_trim()
+    })
+  }
+
   toolbar_id <- str_c(session$ns("toolbar"))
   export_id <- str_c(session$ns("export"))
   dig_widget <- str_c(session$ns("digits"))
@@ -206,7 +216,7 @@ extendedDT_with_code <- function(input, output, session, reactive_table, filenam
 
     if(!is.null(n_digits) && !is.na(n_digits)){
       dt$x$data <- dt$x$data %>%
-        mutate_if(is.double, ~ signif(., digits = n_digits))
+        mutate_if(is.double, format_signif, digits = n_digits)
     }
 
     if(buttons){

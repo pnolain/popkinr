@@ -6,7 +6,7 @@
 \alias{serverBrowser}
 \title{Server browser tree module}
 \usage{
-serverBrowserUI(id)
+serverBrowserUI(id, max_height = "500px")
 
 serverBrowser(
   input,
@@ -15,7 +15,8 @@ serverBrowser(
   root_directory = "/",
   initial_selection = NULL,
   dir_highlight = NULL,
-  file_highlight = NULL
+  file_highlight = NULL,
+  folder_shortcuts = NULL
 )
 }
 \arguments{

@@ -5,10 +5,14 @@
 #' @export
 #'
 #' @examples
-serverBrowserUI <- function(id) {
+serverBrowserUI <- function(id, max_height = "500px") {
   ns <- NS(id)
+
   tagList(
+    uiOutput(ns("folder_shortcuts")),
     uiOutput(ns("dir_path")),
+    div(id = "browser_container",
+        style = sprintf("overflow: auto; max-height:%s;", max_height),
     shinyTree(ns("tree"),
     types = "
     {
@@ -16,7 +20,7 @@ serverBrowserUI <- function(id) {
     'directory-highlight': {'icon': 'fa fa-archive', 'a_attr' : { 'style' : 'font-weight:bold' }},
     'file':{'icon': 'fa fa-file'},
     'file-highlight': {'icon': 'fa fa-file', 'a_attr' : { 'style' : 'color:red' }}
-    }")
+    }"))
   )
 }
 
@@ -43,7 +47,7 @@ serverBrowserUI <- function(id) {
 #' @export
 #'
 serverBrowser <- function(input, output, session, root_directory = "/",
-                             initial_selection = NULL, dir_highlight = NULL, file_highlight = NULL) {
+                             initial_selection = NULL, dir_highlight = NULL, file_highlight = NULL, folder_shortcuts = NULL) {
 
   root_dir <- root_directory
 
@@ -152,6 +156,40 @@ serverBrowser <- function(input, output, session, root_directory = "/",
                  rvx$selection <- list(is_dir = dir.exists(sel_path),
                                       path = sel_path)
                })
+
+
+  inner_folder_shortcuts <- reactive({
+    if(is.null(folder_shortcuts)) return(NULL)
+
+    folder_shortcuts()
+  })
+
+  output$folder_shortcuts <- renderUI({
+    folders <- req(inner_folder_shortcuts())
+
+    folders_paths <- folders %>% path_real() %>% unique()
+
+    selected_dir <- isolate(rvx$selection$path)
+
+    if(is.null(selected_dir) || !dir.exists(selected_dir))
+      selected_dir <- initial_selection
+
+    selectInput(session$ns("folder_shortcuts"),
+                "Jump to folder",
+                choices = c("/", sort(folders_paths)),
+                selected = selected_dir,
+                width = "100%")
+  })
+
+  observeEvent(input$folder_shortcuts, {
+    shortcut_dir <- input$folder_shortcuts
+
+    if(dir.exists(shortcut_dir)){
+      rvx$selection = list(is_dir = is_dir(shortcut_dir),
+                           path = shortcut_dir)
+    }
+  })
+
 
   return(reactive({
     list(folder = ifelse(rvx$selection$is_dir, rvx$selection$path, NA_character_),
