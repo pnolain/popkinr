@@ -75,24 +75,6 @@ is_nm_run_folder <- function(dir_path){
   all(c("xml", "ext") %in% tools::file_ext(dir_files))
 }
 
-run_browser_formatting <- function(id, text){
-  # `id` is the path of the tree node
-  is_nm_run <- is_nm_run_folder(id)
-  if(is_nm_run) return(sprintf("<span style='color:red;'>%s</span>", text))
-
-  has_archives <- (length(list.files(id, pattern = "(\\.tar\\.gz|\\.zip|\\.tgz)$", ignore.case = TRUE)) > 0)
-  if(has_archives) return(sprintf("<strong>%s</strong>", text))
-
-  text
-}
-
-control_file_browser_formatting <- function(id, text){
-  has_cs <- (length(list.files(id, pattern = "\\.(con|ctl|mod)$", ignore.case = TRUE)) > 0)
-  if(has_cs) return(sprintf("<strong>%s</strong>", text))
-
-  text
-}
-
 browsing_root <- ifelse(env_popkin_root != "", env_popkin_root, "/")
 
 startup_last_runs <- tibble(date = as.POSIXct(character()), path = character())

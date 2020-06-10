@@ -2,7 +2,7 @@ options(shiny.fullstacktrace = TRUE)
 
 # # DEBUGGING
 # plan(sequential)
-plan(multiprocess)
+# plan(multiprocess)
 
 env_home <- Sys.getenv("HOME")
 env_nm_exe <- Sys.getenv("NM_EXE")

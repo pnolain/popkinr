@@ -17,17 +17,6 @@ is_nm_run_folder <- function(dir_path){
   all(c("xml", "ext") %in% exts$result)
 }
 
-run_browser_formatting <- function(id, text){
-  # `id` is the path of the tree node
-  is_nm_run <- is_nm_run_folder(id)
-  if(is_nm_run) return(sprintf("<span style='color:red;'>%s</span>", text))
-
-  has_archives <- (length(list.files(id, pattern = "(\\.tar\\.gz|\\.zip|\\.tgz)$", ignore.case = TRUE)) > 0)
-  if(has_archives) return(sprintf("<strong>%s</strong>", text))
-
-  text
-}
-
 run_browser <- callModule(popkinr::serverBrowser, "run_browser",
                           root_directory = browsing_root,
                           initial_selection = user_initial_selection,
