@@ -1,7 +1,7 @@
 Package: popkinr
 Type: Package
 Title: Shiny applications for pharmacometrics
-Version: 1.3
+Version: 1.3.001
 Authors@R: c(person("Patrick", "Nolain", email = "patrick.nolain@sanofi.com", role = c("aut", "cre")),person("Combet", "Romain", email = "romain.combet@sanofi.com", role = c("aut")))
 Description: Shiny applications for exploratory dataset analysis, NONMEM run management and post-processing
 License: GPL-3
@@ -47,4 +47,4 @@ Imports:
   xml2,
   zoo
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
