@@ -84,11 +84,6 @@ output$selected_dv_vs_pred_data <- renderDataTable({
   lhs <- (brush$mapping)[panel_names] %>% unlist
   rhs <- brush[panel_names] %>% unlist
 
-  # browser()
-  # data <- data %>%
-  #   filter_(.dots = sapply(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% unname)
-
-
   exprs <- map(sprintf("~ %s == \"%s\"", lhs, rhs), as.formula) %>% map(as_quosure) %>%  unname()
 
   data <- data %>%

@@ -135,8 +135,6 @@ observe({
   } else if (!is.na(run_browser()$folder)){
     dir_path <- run_browser()$folder
     selection_is_nm_run <- is_nm_run_folder(run_browser()$folder)
-
-    # browser()
   }
 
   shinyjs::toggleState("load_run", condition = selection_is_nm_run)

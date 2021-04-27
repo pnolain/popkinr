@@ -62,7 +62,6 @@ serverBrowser <- function(input, output, session, root_directory = "/",
       dirs <- dir_ls(path, type = "directory", recurse = FALSE, full.names = TRUE) %>% path_real()
       allFiles <- dir_ls(path, type = "file") %>% path_real()
     } else {
-      # browser()
       dirs <- dir_ls(path, type = "directory", recurse = FALSE, full.names = TRUE) %>% path_expand() %>% path_norm()
       allFiles <- dir_ls(path, type = "file") %>% path_expand() %>% path_norm()
     }

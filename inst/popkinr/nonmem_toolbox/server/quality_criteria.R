@@ -115,7 +115,6 @@ build_pmxploit_qc_call <- function(){
   args_values <- args_values[!args_to_skip]
   pmxploit_call <- call2(first(pmxploit_chain), !!!(args_values))
 
-  # browser()
   run <- req(rv$run)
   # Create a `load_nm_run` call with the run path
   load_run_call <- call2(quote(load_nm_run), run$info$path)

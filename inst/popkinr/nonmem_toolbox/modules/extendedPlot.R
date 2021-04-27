@@ -55,7 +55,6 @@ extendedPlot <- function(input, output, session,
                          r_code = TRUE){
 
   build_pmxploit_plot_call <- function(){
-    # browser()
 
     # Get reactive_plot function content
     reactive_wrapper_envir <- get_env(reactive_plot)
@@ -146,7 +145,6 @@ extendedPlot <- function(input, output, session,
     # pmxploit_call <- edit_call(pmxploit_chain, !!!(args_values))
 
     # NEW: Remove default arguments that are not changed
-    # browser()
     original_args <- formals(eval(first(pmxploit_chain)))
 
     args_to_skip <- map2_lgl(args_values, original_args[names(args_values)], function(a, b){
@@ -443,44 +441,4 @@ extendedPlot <- function(input, output, session,
       easyClose = TRUE
     )
   }
-
-  # n_facets_test <- reactive({
-  #   my_plot <- req(zoomed_plot())$plot
-  #
-  #     # browser()
-  #     facet_covs <- intersect(names(my_plot$facet$params$facets), names(my_plot$data))
-  #
-  #     facet_cols <- syms(facet_covs)
-  #
-  #     # browser()
-  #     req(is.data.frame(my_plot$data))
-  #
-  #    n_facets <- my_plot$data %>%
-  #       group_by(!!!(facet_cols)) %>%
-  #       summarize() %>%
-  #       nrow()
-  #
-  #     if(n_facets == 0 || (!is.null(rv$wrap_rows) && n_facets < rv$wrap_rows))
-  #       rv$wrap_rows <- NULL
-  #
-  #    n_facets
-  # })
-  #
-  # output$facetting_output <- renderUI({
-  #
-  #   # browser()
-  #   n_facets <- req(n_facets_test())
-  #
-  #   req(n_facets > 0)
-  #
-  #   isolate({
-  #     # keep current selection
-  #     r_selected <- rv$wrap_rows
-  #
-  #     possible_n_rows <- c(seq_len(n_facets / 2), n_facets)
-  #
-  #     fluidRow(column(6, selectInput(session$ns("wrap_nrow"), "Rows layout",
-  #                                    choices = c("", possible_n_rows), selected = r_selected)))
-  #   })
-  # })
 }

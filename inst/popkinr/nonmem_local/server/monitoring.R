@@ -138,8 +138,6 @@ output$local_run_list <- renderDataTable({
 my_promise_error_handling <- function(error){
   err_msg <- error$message
 
-  # browser()
-
   shinyjs::html("dialog_msg", str_c("<span style='color: red; font-weight: bold;'>", err_msg, "</span>"))
   print(err_msg)
 
@@ -182,11 +180,9 @@ observeEvent(input$show_run_details, {
 
   s_time <- now()
 
-  # browser()
   future({refresh_run_check(r_number, s_time) }) %>%
     then(
       onFulfilled = function(value) {
-        # browser()
         rv_futures$details <- value
         shinyjs::html("dialog_msg", "")
       },

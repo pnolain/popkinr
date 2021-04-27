@@ -123,7 +123,6 @@ extendedDT_with_code <- function(input, output, session, reactive_table, filenam
     # pmxploit_call <- edit_call(pmxploit_chain, !!!(args_values))
 
     # NEW: Remove default arguments that are not changed
-    # browser()
     original_args <- formals(eval(first(pmxploit_chain)))
 
     args_to_skip <- map2_lgl(args_values, original_args[names(args_values)], function(a, b){
