@@ -98,7 +98,7 @@ extendedPlot <- function(input, output, session,
     if(length(filter_link) == 1L){
       filter_fn <- call_name(filter_link[[1]])
       # Extract current filters from the application reactiveValues `rv`
-      main_rv <- env_get(plot_fn_envir, "rv")
+      main_rv <- env_get(plot_fn_envir, "rv", default = NULL)
       run_filters <- main_rv$app_filters
 
       if(filter_fn == "filtered_run_show_mdv")

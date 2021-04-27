@@ -73,7 +73,7 @@ extendedDT_with_code <- function(input, output, session, reactive_table, filenam
     filter_link <- chain_links[which(map_lgl(chain_links, ~ is_call(., "filtered_run") || is_call(., "filtered_run_show_mdv")))]
 
     # Extract current filters from the application reactiveValues `rv`
-    main_rv <- env_get(table_fn_envir, "rv")
+    main_rv <- env_get(table_fn_envir, "rv", default = NULL)
     if(length(filter_link) == 1L){
       filter_fn <- call_name(filter_link[[1]])
       run_filters <- main_rv$app_filters

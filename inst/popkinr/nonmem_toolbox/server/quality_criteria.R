@@ -57,7 +57,7 @@ build_pmxploit_qc_call <- function(){
   if(length(filter_link) == 1L){
     filter_fn <- call_name(filter_link[[1]])
     # Extract current filters from the application reactiveValues `rv`
-    main_rv <- env_get(qc_fn_envir, "rv")
+    main_rv <- env_get(qc_fn_envir, "rv", default = NULL)
     run_filters <- main_rv$app_filters
 
     if(filter_fn == "filtered_run_show_mdv")
@@ -115,6 +115,8 @@ build_pmxploit_qc_call <- function(){
   args_values <- args_values[!args_to_skip]
   pmxploit_call <- call2(first(pmxploit_chain), !!!(args_values))
 
+  # browser()
+  run <- req(rv$run)
   # Create a `load_nm_run` call with the run path
   load_run_call <- call2(quote(load_nm_run), run$info$path)
 
