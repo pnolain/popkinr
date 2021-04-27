@@ -56,8 +56,16 @@ serverBrowser <- function(input, output, session, root_directory = "/",
                         refresh = Sys.time())
 
   list_files <- function(path){
-    dirs <- dir_ls(path, type = "directory", recurse = FALSE, full.names = TRUE) %>% path_real()
-    allFiles <- dir_ls(path, type = "file") %>% path_real()
+    dirlist <- dir_ls(path, type = "directory", recurse = FALSE, full.names = TRUE)
+
+    if(.Platform$OS.type != "windows"){
+      dirs <- dir_ls(path, type = "directory", recurse = FALSE, full.names = TRUE) %>% path_real()
+      allFiles <- dir_ls(path, type = "file") %>% path_real()
+    } else {
+      # browser()
+      dirs <- dir_ls(path, type = "directory", recurse = FALSE, full.names = TRUE) %>% path_expand() %>% path_norm()
+      allFiles <- dir_ls(path, type = "file") %>% path_expand() %>% path_norm()
+    }
     files <- setdiff(allFiles, dirs)
     np <- path_real(path)
 
@@ -174,9 +182,11 @@ serverBrowser <- function(input, output, session, root_directory = "/",
     if(is.null(selected_dir) || !dir.exists(selected_dir))
       selected_dir <- initial_selection
 
+    default_root <- ifelse(.Platform$OS.type == "windows", "C:/", "/")
+
     selectInput(session$ns("folder_shortcuts"),
                 "Jump to folder",
-                choices = c("/", sort(folders_paths)),
+                choices = c(default_root, sort(folders_paths)),
                 selected = selected_dir,
                 width = "100%")
   })
