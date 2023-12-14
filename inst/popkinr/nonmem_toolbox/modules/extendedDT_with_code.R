@@ -6,7 +6,7 @@ extendedDT_with_code_UI <- function(id, title = NULL){
   div(
     h4(title),
     tags$script(HTML(sprintf('$(document).on("input", "#%s", function () { Shiny.onInputChange("%s", this.value); })',
-                             dig_name, dig_name, dig_name))),
+                             dig_name, dig_name))),
     DT::dataTableOutput(ns("table")),
     div(id = ns("r_code_section"),
         h4("R code"),
@@ -71,9 +71,9 @@ extendedDT_with_code <- function(input, output, session, reactive_table, filenam
     # Check if the run is currently filtered, ie. object comes either from `filtered_run()` or `filtered_run_show_mdv()` reactives
     filter_call <- NULL
     filter_link <- chain_links[which(map_lgl(chain_links, ~ is_call(., "filtered_run") || is_call(., "filtered_run_show_mdv")))]
-
+# browser()
     # Extract current filters from the application reactiveValues `rv`
-    main_rv <- env_get(table_fn_envir, "rv")
+    main_rv <- env_get(table_fn_envir, "rv", inherit = TRUE)
     if(length(filter_link) == 1L){
       filter_fn <- call_name(filter_link[[1]])
       run_filters <- main_rv$app_filters
@@ -124,7 +124,7 @@ extendedDT_with_code <- function(input, output, session, reactive_table, filenam
 
     # NEW: Remove default arguments that are not changed
     # browser()
-    original_args <- formals(eval(first(pmxploit_chain)))
+    original_args <- formals(eval(pmxploit_chain[[1]]))
 
     args_to_skip <- map2_lgl(args_values, original_args[names(args_values)], function(a, b){
       if(is_missing(b)) return(FALSE)
@@ -132,7 +132,7 @@ extendedDT_with_code <- function(input, output, session, reactive_table, filenam
     })
 
     args_values <- args_values[!args_to_skip]
-    pmxploit_call <- call2(first(pmxploit_chain), !!!(args_values))
+    pmxploit_call <- call2(pmxploit_chain[[1]], !!!(args_values))
 
     # Create a `load_nm_run` call with the run path
     load_run_call <- call2(quote(load_nm_run), main_rv$run$info$path)

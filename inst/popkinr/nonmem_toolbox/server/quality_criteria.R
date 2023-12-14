@@ -53,11 +53,11 @@ build_pmxploit_qc_call <- function(){
   # Check if the run is currently filtered, ie. object comes either from `filtered_run()` or `filtered_run_show_mdv()` reactives
   filter_call <- NULL
   filter_link <- chain_links[which(map_lgl(chain_links, ~ is_call(., "filtered_run") || is_call(., "filtered_run_show_mdv")))]
-
+# browser()
   if(length(filter_link) == 1L){
     filter_fn <- call_name(filter_link[[1]])
     # Extract current filters from the application reactiveValues `rv`
-    main_rv <- env_get(qc_fn_envir, "rv")
+    main_rv <- env_get(qc_fn_envir, "rv", inherit = TRUE)
     run_filters <- main_rv$app_filters
 
     if(filter_fn == "filtered_run_show_mdv")
@@ -105,7 +105,7 @@ build_pmxploit_qc_call <- function(){
   # pmxploit_call <- edit_call(pmxploit_chain, !!!(args_values))
 
   # NEW: Remove default arguments that are not changed
-  original_args <- formals(eval(first(pmxploit_chain)))
+  original_args <- formals(eval(pmxploit_chain[[1]]))
 
   args_to_skip <- map2_lgl(args_values, original_args[names(args_values)], function(a, b){
     if(is_missing(b)) return(FALSE)
@@ -113,12 +113,12 @@ build_pmxploit_qc_call <- function(){
   })
 
   args_values <- args_values[!args_to_skip]
-  pmxploit_call <- call2(first(pmxploit_chain), !!!(args_values))
+  pmxploit_call <- call2(pmxploit_chain[[1]], !!!(args_values))
 
   # Create a `load_nm_run` call with the run path
-  load_run_call <- call2(quote(load_nm_run), run$info$path)
+  load_run_call <- call2(quote(load_nm_run), main_rv$run$info$path)
 
-  if(identical(run, pmxploit::EXAMPLERUN)){
+  if(identical(main_rv$run, pmxploit::EXAMPLERUN)){
     load_run_call <- quote(pmxploit::EXAMPLERUN)
   }
   # Construct the full call:

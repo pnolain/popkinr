@@ -99,11 +99,11 @@ dashboardPage(
       ),
       menuItem(
         "Files",
-        icon = icon("files-o"),
+        icon = icon("copy"),
         menuSubItem(
           "Control stream",
           tabName = "control_stream_file",
-          icon = icon("file-code-o")
+          icon = icon("file-code")
         ),
         menuSubItem("Report", tabName = "report_file", icon = icon("file-text")),
         menuSubItem("Tables", tabName = "table_files", icon = icon("database"))
@@ -126,7 +126,7 @@ dashboardPage(
           )
         ),
         h6("Patrick Nolain"),
-        tags$a("patrick.nolain@sanofi.com", href="mailto:patrick.nolain@sanofi.com"),
+        tags$a(icon("github"), "github.com/pnolain", href="https://github.com/pnolain"),
         hr(),
         actionLink("example", "Demo")
       )

@@ -6,7 +6,7 @@ extendedDTUI <- function(id, title = NULL){
   div(
     h4(title),
     tags$script(HTML(sprintf('$(document).on("input", "#%s", function () { Shiny.onInputChange("%s", this.value); })',
-                             dig_name, dig_name, dig_name))),
+                             dig_name, dig_name))),
     DT::dataTableOutput(ns("table")))
 }
 

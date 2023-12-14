@@ -98,7 +98,7 @@ extendedPlot <- function(input, output, session,
     if(length(filter_link) == 1L){
       filter_fn <- call_name(filter_link[[1]])
       # Extract current filters from the application reactiveValues `rv`
-      main_rv <- env_get(plot_fn_envir, "rv")
+      main_rv <- env_get(plot_fn_envir, "rv", inherit = TRUE)
       run_filters <- main_rv$app_filters
 
       if(filter_fn == "filtered_run_show_mdv")
@@ -147,7 +147,7 @@ extendedPlot <- function(input, output, session,
 
     # NEW: Remove default arguments that are not changed
     # browser()
-    original_args <- formals(eval(first(pmxploit_chain)))
+    original_args <- formals(eval(pmxploit_chain[[1]]))
 
     args_to_skip <- map2_lgl(args_values, original_args[names(args_values)], function(a, b){
       if(is_missing(b)) return(FALSE)
@@ -155,7 +155,7 @@ extendedPlot <- function(input, output, session,
     })
 
     args_values <- args_values[!args_to_skip]
-    pmxploit_call <- call2(first(pmxploit_chain), !!!(args_values))
+    pmxploit_call <- call2(pmxploit_chain[[1]], !!!(args_values))
 
     # Create a `load_nm_run` call with the run path
     load_run_call <- call2(quote(load_nm_run), inner_run()$info$path)
